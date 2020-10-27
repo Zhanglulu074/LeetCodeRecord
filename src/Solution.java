@@ -1567,9 +1567,52 @@ public class Solution {
                 nums[j++] = nums[i];
             }
         }
-        while(j < nums.length) {
+        while (j < nums.length) {
             nums[j++] = 0;
         }
+    }
+
+    //80. 移除数组中重复的元素2
+    public int removeDuplicates2(int[] nums) {
+        int left = 0;
+        int count = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] != nums[left]) {
+                nums[++left] = nums[i];
+                count = 1;
+            } else {
+                if (count < 2) {
+                    nums[++left] = nums[i];
+                }
+                count++;
+            }
+        }
+        return left + 1;
+    }
+
+    //56. 合并区间
+    //这个题算是有点意思，我自己解决的过程中是用了一些单指针+区间重叠判断的思想
+    //总体收看是依据起点排序，而后从顺序遍历，遍历过程使用单指针指示当前处理完毕的节点
+    //遍历过程中，不断比较指针指向位置与当前遍历节点是否重叠，若不重叠，则指针右移，将当前节点内容移动至指针节点处
+    //若重叠，则指针不动，将指针处原区间扩充至覆盖当前节点区间。
+    //最后，将原数组至指针处截断复制即可
+    //遗漏点，最开始没有考虑到两个区间重叠时，可能存在前一个区间完全覆盖后一个区间的情况
+    public int[][] merge(int[][] intervals) {
+        if (intervals == null || intervals.length == 0) {
+            return intervals;
+        }
+        Arrays.sort(intervals, (x, y) -> x[0] - y[0]);
+        int cur = 0;
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][0] > intervals[cur][1]) {
+                intervals[++cur][0] = intervals[i][0];
+                intervals[cur][1] = intervals[i][1];
+            } else {
+                intervals[cur][1] = Math.max(intervals[i][1], intervals[cur][1]);
+            }
+        }
+        int[][] res = Arrays.copyOf(intervals, cur + 1);
+        return res;
     }
 
     public boolean knows(int a, int b) {
@@ -1578,7 +1621,7 @@ public class Solution {
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        int[] test = {2,0,2,1,1,0};
+        int[][] test = {{1, 8}, {2, 5}, {4, 5}, {5, 7}};
 //        List<List<Integer>> list = solution.subsets(test);
 //        for (List<Integer> list1 : list) {
 //            for (int a : list1) {
@@ -1586,9 +1629,9 @@ public class Solution {
 //            }
 //            System.out.println("");
 //        }
-        solution.moveZeroes(test);
-        for (int num : test) {
-            System.out.println(num);
+        int[][] res = solution.merge(test);
+        for (int[] num : res) {
+            System.out.println(num[0] + " " + num[1]);
         }
     }
 
