@@ -1619,9 +1619,74 @@ public class Solution {
         return false;
     }
 
+    //57. 插入区间（开心，hard一遍过)
+    //这个题最开始走了一些弯路，后来才发现要换一种思维方式来看这个东西
+    //其实从最后的处理结果来看，我们最终结果是由三部分构成，
+    //1. 插入节点处理后，节点之前的部分(可能为空)，这部分由原区间组成。
+    //2. 插入节点(包含重叠区间进行并集之后的部分)
+    //3. 插入节点之后的部分(可能为空)，这部分由原区间组成。
+    //明确了上面这些东西以后，我们整个算法只需要拿到是三个东西就可以了。
+    //1. start指针，指向第1部分的结尾节点
+    //2. 进行重叠并集处理之后的新区间
+    //3. end指针，指向第3部分的开始节点。
+    //上面这种思维的好处在于，简化了整个问题流程，不需要再考虑各种特殊情况(如新区间插在队头，插在队尾，插在队中)带来的新数组长度的变化
+    //这样问题转化之后其实就很简单了。
+    public int[][] insert(int[][] intervals, int[] newInterval) {
+        if (intervals == null || newInterval == null || newInterval.length == 1) {
+            return intervals;
+        }
+        int cur = 0;
+        int start = 0;
+        //首先计算按照开始时间，新区间所处的位置
+        for (int i = 0; i < intervals.length; i++) {
+            if (newInterval[0] >= intervals[i][0]) {
+                cur++;
+            }
+        }
+        //start指针求解，这个分三种情况就行
+        if (cur == 0) {
+            start = -1;
+        } else if (newInterval[0] > intervals[cur - 1][1]) {
+            start = cur - 1;
+        } else {
+            start = cur - 2;
+        }
+        //end初始化为start指针的后一位
+        int end = start + 1;
+        //end指针求解+新区间重叠处理求解
+        for (int i = start + 1; i < intervals.length; i++) {
+            //一旦不再重叠，则这之后的区间都维持原状，无需处理。
+            if (newInterval[1] < intervals[i][0]) {
+                break;
+            } else {
+                //若存在重叠，则进行并集处理，同时end指针右移
+                newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+                newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+                end++;
+            }
+        }
+        //新区间长度，这个公式在纸上边写一写就很清楚了
+        int[][] res = new int[intervals.length + start - end + 2][2];
+        //按部就班，复制到新数组就可以了。
+        for (int i = 0; i <= start; i++) {
+            res[i][0] = intervals[i][0];
+            res[i][1] = intervals[i][1];
+        }
+        res[start + 1][0] = newInterval[0];
+        res[start + 1][1] = newInterval[1];
+        for (int i = start + 2; i < res.length; i++) {
+            res[i][0] = intervals[end][0];
+            res[i][1] = intervals[end][1];
+            end++;
+        }
+        return res;
+    }
+
+
     public static void main(String[] args) {
         Solution solution = new Solution();
-        int[][] test = {{1, 8}, {2, 5}, {4, 5}, {5, 7}};
+        int[][] test = {{1, 3}};
+        int[] test1 = {-1, 1};
 //        List<List<Integer>> list = solution.subsets(test);
 //        for (List<Integer> list1 : list) {
 //            for (int a : list1) {
@@ -1629,7 +1694,7 @@ public class Solution {
 //            }
 //            System.out.println("");
 //        }
-        int[][] res = solution.merge(test);
+        int[][] res = solution.insert(test, test1);
         for (int[] num : res) {
             System.out.println(num[0] + " " + num[1]);
         }
