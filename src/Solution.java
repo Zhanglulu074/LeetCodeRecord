@@ -3,7 +3,9 @@ import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.sun.tools.javadoc.Start;
 import javafx.util.Pair;
 import org.omg.PortableInterceptor.INACTIVE;
+import sun.print.CUPSPrinter;
 import sun.tools.jstack.JStack;
+import sun.tools.jstat.Jstat;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -1385,7 +1387,7 @@ public class Solution {
     public int minMeetingRooms(int[][] intervals) {
         int[] starts = new int[intervals.length];
         int[] ends = new int[intervals.length];
-        for (int i = 0; i < starts.length; i++) {
+        for (int i = 0; i < intervals.length; i++) {
             starts[i] = intervals[i][0];
             ends[i] = intervals[i][1];
         }
@@ -1682,22 +1684,152 @@ public class Solution {
         return res;
     }
 
+    //228. 汇总区间
+    //这个题的基本套路还是简单的，这个数组中，对于两个相邻元素，无非是二者相差大于或等于1，
+    //若等于1，则二者在同一区间
+    //若大于1，则二者在不同区间
+    //这题真正的难点在与想到使用while循环而非for循环，
+    //最开始我的想法是使用for循环，每个迭代都判断一次，这样需要判定的特殊情况由很多（尤其是最后一个数单独一个区间的情况）
+    //最好的做法还是使用while循环，以区间为单位，在一个区间遍历完成后，再去向下继续遍历下一个区间，这样就简单多了。
+    public List<String> summaryRanges(int[] nums) {
+        int start = 0, end = 0;
+        if (nums == null) {
+            return null;
+        }
+        List<String> res = new ArrayList<>();
+        int i = 0;
+        while (i < nums.length) {
+            start = i;
+            while (i + 1 < nums.length && nums[i + 1] == nums[i] + 1) {
+                i++;
+            }
+            end = i;
+            if (start != end) {
+                res.add(nums[start] + "->" + nums[end]);
+            } else {
+                res.add("" + nums[start]);
+            }
+            i++;
+        }
+        return res;
+    }
+
+
+    //163. 缺失的区间
+    //这个题与228类似，这里我才用了一点取巧的方式来规避循环后重新处理结尾的方法：
+    //也就是复制数组，把upper+1加入到数组末位，这样在正常遍历过程中就可以把最后的结尾算进去。
+    //机制和228类似，也是遍历区间，但不同的是遍历完一个区间后，输出的不是该区间，而是该区间与上一个区间的间隔。
+    public List<String> findMissingRanges(int[] nums, int lower, int upper) {
+        int lastEnd = lower - 1;
+        int curStart = 0;
+        int i = 0;
+        List<String> res = new ArrayList<>();
+        if (nums == null) {
+            return res;
+        }
+        int[] tmp = Arrays.copyOf(nums, nums.length + 1);
+        tmp[nums.length] = upper + 1;
+        while (i < tmp.length) {
+            curStart = tmp[i];
+            if (lastEnd + 1 < curStart - 1) {
+                res.add((lastEnd + 1) + "->" + (curStart - 1));
+            } else if (lastEnd == curStart - 2) {
+                res.add("" + (lastEnd + 1));
+            }
+            while (i + 1 < tmp.length - 1 && tmp[i + 1] <= tmp[i] + 1) {
+                i++;
+            }
+            lastEnd = tmp[i];
+            i++;
+
+        }
+        return res;
+    }
+
+    //53. 最大子序和
+    //这个东西有点诡异哈，看起来其实还是用动态规划快一些
+    //状态变量选取"f(i) = 以第i个元素结尾的子数组的最大和"(注意这种形式在解决连续子数组问题时非常有用
+    public int maxSubArray(int[] nums) {
+        int[] sums = new int[nums.length];
+        sums[0] = nums[0];
+        int res = sums[0];
+        for (int i = 1; i < nums.length; i++) {
+            sums[i] = Math.max(nums[i], sums[i - 1] + nums[i]);
+            res = Math.max(sums[i], res);
+        }
+        return res;
+    }
+
+    //325. 和等于 k 的最长子数组长度
+    //这个题属于典型的子数组(分段处理)的题型
+    //这里需要注意的一个小的技巧点在于，可以使用哈希表用于存储前缀和和其对应的索引，方便后续查找
+    //基本思路是这样的，首先求各个为止对应的前缀和以及对应索引，存在HashMap中
+    //而后二次遍历各个元素的前缀和，这个时候注意，与之对应的和为k的元素下标，可以直接在map中，查找得到。
+    //这里查找的手段由从左到右，从右到左两种，如果从左到右，则查询key为当前前缀和加上k
+    //如果从右到左，则查询key为前缀和-k。
+    //更优的方案为从右到左，这样可以把控长度，一旦从右到做的遍历长度小于max，则可直接终止遍历。
+    public int maxSubArrayLen(int[] nums, int k) {
+        if (nums == null) {
+            return 0;
+        }
+        Map<Integer, Integer> map = new HashMap<>();
+        int[] sums = new int[nums.length + 1];
+        int res = 0;
+        map.put(0, 0);
+        for (int i = 0; i < nums.length; i++) {
+            sums[i + 1] = sums[i] + nums[i];
+            map.put(sums[i + 1], i + 1);
+        }
+
+        for (int i = 0; i < sums.length; i++) {
+            if (map.containsKey(sums[i] + k)) {
+                res = Math.max(res, (map.get(sums[i] + k) - i));
+            }
+        }
+        return res;
+    }
+
+
+    //152. 乘积最大子数组
+    //这个题看着和那个最大子序和的题差不多，但其实有个陷阱：在于加和这个操作两个较大的相加一定大于两个较小的相加
+    //但乘法不同，存在两个较小的相乘，大于两个较大的相乘的情况（负负得正）
+    //所以思路的基本点在于：
+    //f[i]仍然表示以第i个元素作为结尾的子数组的最大值，但是需要注意：
+    //这里需要分情况讨论：
+    //若nums[i] >= 0,则取的是max(nums[i], f[i-1])
+    //若nums[i] < 0,则取的是max(nums[i], 以i-1为结尾的最小乘积)
+    //也就是说，我们需要同时维护最大、最小两个dp数组方可。
+    public int maxProduct(int[] nums) {
+        int[] resListMax = new int[nums.length];
+        int[] resListMin = new int[nums.length];
+        resListMax[0] = nums[0];
+        resListMin[0] = nums[0];
+        int res = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            //关于下面这种分情况讨论，有一个稍微优化的方法：
+            //例如针对resListMax[i]，可以直接取nums[i]、resListMax[i - 1] * nums[i]、 resListMin[i - 1] * nums[i]的最大值，避免一次判断
+            //不过这里没有用，因为感觉上这个东西优化优先，其实只是停留在代码简洁程度层面，对真正意义上的运行效率没啥帮助。
+            if (nums[i] >= 0) {
+                resListMax[i] = Math.max(nums[i], resListMax[i - 1] * nums[i]);
+                resListMin[i] = Math.min(nums[i], resListMin[i - 1] * nums[i]);
+            } else {
+                resListMax[i] = Math.max(nums[i], resListMin[i - 1] * nums[i]);
+                resListMin[i] = Math.min(nums[i], resListMax[i - 1] * nums[i]);
+            }
+            res = Math.max(resListMax[i], res);
+        }
+        return res;
+    }
+
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        int[][] test = {{1, 3}};
-        int[] test1 = {-1, 1};
-//        List<List<Integer>> list = solution.subsets(test);
-//        for (List<Integer> list1 : list) {
-//            for (int a : list1) {
-//                System.out.print(a + " ");
-//            }
-//            System.out.println("");
+        int[] test = {2,3,-2,4};
+        int res = solution.maxProduct(test);
+        System.out.println(res);
+//        for (String s : list) {
+//            System.out.println(s);
 //        }
-        int[][] res = solution.insert(test, test1);
-        for (int[] num : res) {
-            System.out.println(num[0] + " " + num[1]);
-        }
     }
 
     public static ListNode generateListNodes(int[] nums) {
