@@ -7,6 +7,7 @@ import sun.print.CUPSPrinter;
 import sun.tools.jstack.JStack;
 import sun.tools.jstat.Jstat;
 
+import java.sql.Struct;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1821,15 +1822,423 @@ public class Solution {
         return res;
     }
 
+    // 48. 旋转图像
+    public void rotate(int[][] matrix) {
+        rotateInY(matrix);
+        rotateInPosCross(matrix);
+    }
+
+    public void rotateInX(int[][] matrix) {
+        int N = matrix.length;
+        for (int i = 0; i < matrix.length; i++) {
+            int tmp = 0;
+            for (int j = 0; j < N / 2; j++) {
+                tmp = matrix[i][N - j - 1];
+                matrix[i][N - j - 1] = matrix[i][j];
+                matrix[i][j] = tmp;
+            }
+        }
+    }
+
+    public void rotateInY(int[][] matrix) {
+        int N = matrix.length;
+        for (int i = 0; i < N / 2; i++) {
+            int tmp = 0;
+            for (int j = 0; j < matrix.length; j++) {
+                tmp = matrix[N - i - 1][j];
+                matrix[N - i - 1][j] = matrix[i][j];
+                matrix[i][j] = tmp;
+            }
+        }
+        int i = 1;
+    }
+
+    public void rotateInPosCross(int[][] matrix) {
+        int N = matrix.length;
+        for (int i = 0; i < N; i++) {
+            int tmp;
+            for (int j = 0; j < i; j++) {
+                tmp = matrix[j][i];
+                matrix[j][i] = matrix[i][j];
+                matrix[i][j] = tmp;
+            }
+        }
+    }
+
+    public void rotateInNegCross(int[][] matrix) {
+        int N = matrix.length;
+        for (int i = 0; i < N; i++) {
+            int tmp;
+            for (int j = 0; j < N - 1 - i; j++) {
+                tmp = matrix[N - 1 - j][N - 1 - i];
+                matrix[N - 1 - j][N - 1 - i] = matrix[i][j];
+                matrix[i][j] = tmp;
+            }
+        }
+    }
+
+    //73. 矩阵置零
+    //时间复杂度O(M*N)，空间复杂度O(M + N)
+    public void setZeroes(int[][] matrix) {
+        if (matrix == null) {
+            return;
+        }
+        Set<Integer> setX = new HashSet<>();
+        Set<Integer> setY = new HashSet<>();
+        int NX = matrix.length;
+        int NY = matrix[0].length;
+        for (int i = 0; i < NX; i++) {
+            for (int j = 0; j < NY; j++) {
+                if (matrix[i][j] == 0) {
+                    setX.add(i);
+                    setY.add(j);
+                }
+            }
+        }
+        for (int x : setX) {
+            for (int i = 0; i < NY; i++) {
+                matrix[x][i] = 0;
+            }
+        }
+        for (int y : setY) {
+            for (int i = 0; i < NX; i++) {
+                matrix[i][y] = 0;
+            }
+        }
+    }
+
+    //73. 矩阵置0
+    // 优化方法：时间复杂度O(M*N)，空间复杂度O(1)
+    // 这种做法的核心思路在于，使用矩阵每一行每一列的第一个元素作为标识位，监测到该行需要置0，则将第一行元素置0，这样不会有冲突
+    // 不过有个地方需要注意，就是第一行第一列是互相冲突的，因此需要使用一个额外的标志位来标记第一列是否需要置0。
+    public void setZeroes1(int[][] matrix) {
+        if (matrix == null) {
+            return;
+        }
+        boolean isColSet = false;
+        int NX = matrix.length;
+        int NY = matrix[0].length;
+        for (int i = 0; i < NX; i++) {
+            if (matrix[i][0] == 0) {
+                isColSet = true;
+            }
+        }
+        for (int i = 0; i < NX; i++) {
+            for (int j = 1; j < NY; j++) {
+                if (matrix[i][j] == 0) {
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+        for (int i = 1; i < NX; i++) {
+            for (int j = 1; j < NY; j++) {
+                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        if (matrix[0][0] == 0) {
+            for (int i = 0; i < NY; i++) {
+                matrix[0][i] = 0;
+            }
+        }
+        if (isColSet) {
+            for (int i = 0; i < NX; i++) {
+                matrix[i][0] = 0;
+            }
+        }
+    }
+
+    // 134. 加油站(有点小困难呢，需要好好想想怎么证明)
+    // 关键性的定理在于，如果总的加油大于总的花费，则一定存在解！(这个定理需要考虑一下怎么证明)
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+//        int total = 0;
+//        int cur = 0;
+//        for (int i = 0; i < gas.length; i++) {
+//            total += gas[i] - cost[i];
+//            cur += gas[i] - cost[i];
+//        }
+        return -1;
+    }
+
+    public int binarySearch(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (nums[mid] > target) {
+                end = mid - 1;
+            } else if (nums[mid] < target) {
+                start = mid + 1;
+            } else {
+                return mid;
+            }
+            System.out.println("start = " + start + " end = " + end);
+        }
+        System.out.println("start = " + start + " end = " + end);
+        return -1;
+    }
+
+    public int binarySearch1(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+            if (nums[mid] > target) {
+                end = mid;
+            } else if (nums[mid] < target) {
+                start = mid + 1;
+            } else {
+                return mid;
+            }
+            System.out.println("start = " + start + " end = " + end);
+        }
+        System.out.println("start = " + start + " end = " + end);
+        return -1;
+    }
+
+    public int binarySearch3(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        while (start + 1 < end) {
+            int mid = start + (end - start) / 2;
+            if (nums[mid] > target) {
+                end = mid;
+            } else if (nums[mid] < target) {
+                start = mid;
+            } else {
+                return mid;
+            }
+            System.out.println("start = " + start + " end = " + end);
+        }
+        if (nums[start] == target) {
+            return start;
+        } else if (nums[end] == target) {
+            return end;
+        }
+        System.out.println("start = " + start + " end = " + end);
+        return -1;
+    }
+
+
+    // 35. 搜索插入位置
+    public int searchInsert(int[] nums, int target) {
+        if (nums == null) {
+            return -1;
+        }
+        int start = 0;
+        int end = nums.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (nums[mid] < target) {
+                start = mid + 1;
+            } else if (nums[mid] > target) {
+                end = mid - 1;
+            } else {
+                return mid;
+            }
+        }
+        return start;
+    }
+
+    // 278. 第一个错误的版本
+
+
+    // 33. 搜索旋转排序数组
+    public int search(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            }
+            if (nums[mid] >= nums[start]) {
+                if (target >= nums[start] && target < nums[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            } else if (nums[mid] <= nums[end]) {
+                if (target > nums[mid] && target <= nums[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
+
+    //81. 搜索旋转排序数组2
+    public boolean search81(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (nums[mid] == target) {
+                return true;
+            }
+            //81这个可重复的条件容易出现start、mid、end的值都相同，从而导致后续判断错误，找了错误的半边进行搜索。
+            if (nums[start] == nums[mid] && nums[mid] == nums[end]) {
+                start++;
+                end--;
+                //这种方法看似暴力，实际上有他的道理在，这种兼顾两个半边的二分，其实是不怕通过+1,-1这种形式的缩减的
+                //并且在这种条件下，start==mid==end，mid在最开始的判断中以及断定并非target所以不会漏判
+            } else if (nums[mid] >= nums[start]) {
+                //这里的else if是有大文章的，因为之前那波start++, end--的操作很容易搞出越界或者start<end的情况。
+                //一次在操作完后，需要进入下一次循环先排除这些情况。
+                if (target >= nums[start] && target < nums[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            } else if (nums[mid] <= nums[end]) {
+                if (target > nums[mid] && target <= nums[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
+        }
+        return false;
+    }
+
+    //74. 搜索二维矩阵
+    //这个题比较简单，说是二维矩阵，其实只是一个变形后的一维矩阵而已，只要将index转变为二维矩阵坐标就可以了。
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0) {
+            return false;
+        }
+        int start = 0;
+        int end = matrix.length * matrix[0].length - 1;
+        int[] midCoord = new int[2];
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            get2DIndex(mid, midCoord, matrix[0].length);
+            if (matrix[midCoord[0]][midCoord[1]] < target) {
+                start = mid + 1;
+            } else if (matrix[midCoord[0]][midCoord[1]] > target) {
+                end = mid - 1;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //240. 搜索二维数组2
+    //这个题过于特殊，只能说看起来形式和思路有点想二分法，但其实压根不是二分法。
+    //他的关键在于，由于矩阵的行和列都是递增的(但不同行、不同列没有明确的大小关系)
+    //这个算法总的来说可以视为高级排除法，逐行、逐列的去排除，最终找到目标为止（或者找不到）
+    public boolean searchMatrix240(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0) {
+            return false;
+        }
+        int row = 0;
+        int col = matrix[0].length - 1;
+        //注意这里row、col 分别从第一行和最后一列开始。
+        while (col >= 0 && row < matrix.length) {
+            if (target == matrix[row][col]) {
+                return true;
+            } else if (target < matrix[row][col]) {
+                //若当前对应元素小于target，则必定不当前列(或之后),需要列下标col-1(因为单列之内是递增的)
+                col--;
+            } else {
+                //若当前元素大于target，则必定不再当前行，必须是后面的行，因此行下表row+1
+                row++;
+            }
+        }
+        return false;
+    }
+
+    //374. 猜数字
+    public int guessNumber(int n) {
+        int start = 1;
+        int end = n;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (guess(mid) == -1) {
+                end = mid - 1;
+            } else if (guess(mid) == 1) {
+                start = mid + 1;
+            } else {
+                return mid;
+            }
+        }
+        return -1;
+    }
+
+    int guess(int num) {
+        return -1;
+    }
+
+    public void get2DIndex(int index, int[] res, int cols) {
+        res[0] = index / cols;
+        res[1] = index - res[0] * cols;
+    }
+    //34. 在排序数组中查找元素的第一个和最后一个位置
+    //这个题的关键点在第一个和最后一个这个东西：
+    //对于普通的二分法而言，找到的目标值到底是第一个还是最后一个其实是没有保障的。
+    //要想保障，就必须在找到一个目标值以后做个判断，
+    //1. 如果想想左遍历，则需要看前一个值是否也是target，若是，则end = mid - 1,继续进行；若不是，则直接返回。
+    //2. 如果想想右遍历，同上，逻辑反过来即可。
+    //！！！！！！！！！分割线：
+    //LC官方题解要更加精妙，他使用了第二中迭代方式left < right，我们知道，这种方式下：
+    //只有nums[mid] > target的的时候，right才会收缩，其仅仅收缩至mid，不会继续收缩
+    //这样，在规定向右搜索，只要修改条件，删除循环中的返回语句，则最终找到的left - 1（注意这里）默认就是最右边的元素。
+    //而向左遍历则也比较简单，继续修改条件，同样去除直接返回的语句，改为当nums[mid] <= target时候，right = mid;
+    //这样就有且仅有num[mid] < target的时候，left才前进一位，即可保证最终拿到的left值就是最左边的值。
+    public int[] searchRange(int[] nums, int target) {
+        int[] res = {-1, -1};
+        if (nums == null) {
+            return res;
+        }
+        int leftIndex = binarySearchLeft(nums, target, true);
+        if (leftIndex == -1) {
+            return res;
+        } else if (leftIndex == nums.length - 1 || nums[leftIndex + 1] != target) {
+            res[0] = leftIndex;
+            res[1] = leftIndex;
+            return res;
+        }
+        int rightIndex = binarySearchLeft(nums, target, false);
+        res[0] = leftIndex;
+        res[1] = rightIndex;
+        return res;
+    }
+
+    public int binarySearchLeft(int[] nums, int target, boolean left) {
+        int start = 0;
+        int end = nums.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (nums[mid] > target) {
+                end = mid - 1;
+            } else if (nums[mid] < target) {
+                start = mid + 1;
+            } else {
+                if (left && mid >= 1 && nums[mid - 1] == target) {
+                    end = mid - 1;
+                } else if (!left && mid < nums.length - 1 && nums[mid + 1] == target) {
+                    start = mid + 1;
+                } else {
+                    return mid;
+                }
+            }
+        }
+        return -1;
+    }
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        int[] test = {2,3,-2,4};
-        int res = solution.maxProduct(test);
-        System.out.println(res);
-//        for (String s : list) {
-//            System.out.println(s);
-//        }
+//        int[][] test = {{1, 2, 3, 4},
+//                {5, 6, 7, 8},
+//                {9, 10, 11, 12}};
+        int[] test = {1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 5};
+        System.out.println(solution.binarySearchLeft(test, 3, true));
+
     }
 
     public static ListNode generateListNodes(int[] nums) {
