@@ -1962,6 +1962,10 @@ public class Solution {
         return -1;
     }
 
+    /*---------------------------二分法---------------------------*/
+    /*---------------------------二分法---------------------------*/
+
+
     public int binarySearch(int[] nums, int target) {
         int start = 0;
         int end = nums.length - 1;
@@ -2228,7 +2232,703 @@ public class Solution {
                 }
             }
         }
-        return -1;
+        return start;
+    }
+
+
+    //275. H指数
+    //这个题是真没有想对路子，难点还在于找对判定条件，本题中的H指数成立的判定条件应该为：
+    //citations[pivot] >= n - pivot
+    //而找最大的H指数的判定边界条件应该为：
+    //citations[pivot] == n - pivot
+    //原因在于，在这种情况下，若是继续想左边着，则citations[pivot]不会再变大，而n - pivot必然变大
+    //这样就不满足H指数的条件了，而向右找，则还能满足H指数的条件，但是所得的h指数只会变小。
+    //这样直接满足这个条件的东西肯定就是我们需要的h参数了，但是。。。
+    //而这样就存在找不到一个真的满足临界条件的解的情况（比如{1, 5, 5, 5, 5}最大的H指数为4，但4并不在数组中，一定找不到）
+    //这样我们就需要结合三种迭代形式找不到的情况下的解来看了。
+    //我们知道第一种迭代形式left <= right找不到时，最终真正的解应该落在[right, left]之间，
+    //根据h指数的定义此时我们数组长度length - left，即可得到最终的h指数。
+    public int hIndex(int[] citations) {
+        int idx = 0, n = citations.length;
+        int pivot, left = 0, right = n - 1;
+        while (left <= right) {
+            pivot = left + (right - left) / 2;
+            if (citations[pivot] == n - pivot) return n - pivot;
+            else if (citations[pivot] < n - pivot) left = pivot + 1;
+            else right = pivot - 1;
+        }
+        System.out.println(left + " " + right);
+        return n - left;
+    }
+
+    /*---------------------------链表题---------------------------*/
+    /*---------------------------链表题---------------------------*/
+
+    public ListNode swapPairs2(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode dump = new ListNode(0);
+        ListNode l1 = dump;
+        ListNode l2 = head;
+        while (l2 != null && l2.next != null) {
+            l1.next = l2.next;
+            ListNode newStart = l2.next.next;
+            l2.next.next = l2;
+            l2.next = newStart;
+            l1 = l2;
+            l2 = l2.next;
+        }
+        return dump.next;
+    }
+
+    //328. 奇偶链表
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode l1 = head;
+        ListNode l2 = head.next;
+        ListNode EventHead = l2;
+        ListNode pre = l1;
+        int i = 1;
+        while (l2 != null) {
+            l1.next = l2.next;
+            pre = l1;
+            l1 = l2;
+            l2 = l2.next;
+            i++;
+        }
+        if ((i & 1) == 0) {
+            pre.next = EventHead;
+        } else {
+            l1.next = EventHead;
+        }
+        return head;
+    }
+
+    //206. 反转链表
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = null;
+        while (head != null) {
+            ListNode tmp = head.next;
+            head.next = pre;
+            pre = head;
+            head = tmp;
+        }
+        return pre;
+    }
+
+    //206 反转链表（聪明的做法）
+    //注意，至少仅就这个题目而言，不算什么聪明的做法，容易让人读起来很难理解：
+    //这个地方算法的核心其实是：
+    //每次都把下一个节点移向队首：
+    //要做到这一点，收看需要一个假的头节点dummy，而后每次将head的下一个节点移向头节点
+    //举例来说：
+    //对于 1 -> 2 -> 3 -> 4 -> 5 -> 6
+    //首先新增一个头节点0：
+    //0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6
+    //而后
+    //(pre)0 -> (head)1 -> (tmp)2 -> 3 -> 4 -> 5 -> 6
+    //我们把tmp移动向队首：
+    //(pre)0 -> 2 -> (head)1 -> (tmp)3 -> 4 -> 5 -> 6
+    //继续:
+    //(pre)0 -> 3 -> 2 -> (head)1 -> (tmp)4 -> 5 -> 6
+    //以此类推，最终得到结果
+    //这个方法其实整体来说是比原方法复杂的多的，这个题没啥意义，主要针对下一题LC. 92
+    public ListNode reverseList1(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = new ListNode(0);
+        pre.next = head;
+        while (head.next != null) {
+            ListNode tmp = head.next;
+            head.next = tmp.next;
+            tmp.next = pre.next;
+            pre.next = tmp;
+        }
+        return pre.next;
+    }
+
+    //92. 反转链表 II
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        int curIdx = 0;
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode originHead = dummy;
+        while (curIdx < m - 1) {
+            dummy = dummy.next;
+            curIdx ++;
+        }
+        ListNode head1 = dummy;
+        ListNode pre = dummy;
+        ListNode head2 = dummy.next;
+        dummy = dummy.next;
+        while (curIdx < n) {
+            ListNode tmp = dummy.next;
+            dummy.next = pre;
+            pre = dummy;
+            dummy = tmp;
+            curIdx++;
+        }
+        head1.next = pre;
+        head2.next = dummy;
+        return originHead.next;
+    }
+
+    //92. 反转链表 II(聪明做法)
+    //这个题我们上面的做法其实已经足够了，从时间复杂度来说也是最优了，但是代码略显臃肿
+    //接下来我们来找一种更加简洁的写法：
+    //我们注意到，只所以写得这么臃肿是因为，我们需要去记录局部翻转过程中需要断开的几个重要节点。
+    //在翻转后再将他们重新连接起来，
+    //这时候我们就会想，要是不需要这些步骤该多好啊！
+    //于是我们就想到了206中专门写得那个极其难以理解的写法：
+    //这个时候我们会发现，通过这种每次将需要翻转的元素移至队首的写法，似乎也不用考虑重新连接的问题：
+    //因为这种写法可以保证，自始自终整个链表就没有被断开过，只是进行局部移位而已。
+    //哎，这就是大神聪明的地方了：
+    public ListNode reverseBetween1(ListNode head, int m, int n) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = new ListNode(0);
+        ListNode dummy = pre;
+        pre.next = head;
+        ListNode cur = head;
+        for (int i = 1; i < m; i++) {
+            cur = cur.next;
+            pre = pre.next;
+        }
+        for (int i = 0; i < n - m; i++) {
+            ListNode tmp = cur.next;
+            cur.next = tmp.next;
+            tmp.next = pre.next;
+            pre.next = tmp;
+        }
+        return dummy.next;
+    }
+
+    //25. K 个一组翻转链表(🐂逼迭代写法)
+    public ListNode reverseKGroup1(ListNode head, int k) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode pre = dummy;
+        int idx = 1;
+        while (head.next !=null) {
+            if (idx % k == 0) {
+                pre = head;
+                head = head.next;
+                idx ++;
+                continue;
+            }
+            ListNode tmp = head.next;
+            head.next = tmp.next;
+            tmp.next = pre.next;
+            pre.next = tmp;
+            idx ++;
+        }
+        if (idx % k > 1) {
+            head = pre.next;
+            while (head.next != null) {
+                ListNode tmp = head.next;
+                head.next = tmp.next;
+                tmp.next = pre.next;
+                pre.next = tmp;
+            }
+        }
+        return dummy.next;
+    }
+
+    //141. 环形列表
+    //这个题目比较常规的方法是通过HashSet，遍历过程中，每次都将节点存在Set中，
+    //最后无非两种结果：
+    //1.遍历得到null,则无环，返回false
+    //2.遍历得到set中已有的元素，则有环，返回true
+    //另一个就是这种快慢指针法，双指针，同时出发，一个每次过一个节点
+    //另一个每次过两个节点，若有环，则二者必定相遇，此时返回true;
+    //若无环，则快指针必将先遍历至null，则返回false;
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //142. 环形列表II
+    //这个题也可用141那种笨办法，若是判定有环时，直接返回当时遍历的节点即可。
+    //这样简单易懂，但是会引入O(N)N为链表长度的空间复杂度，
+    //另一种延续快慢指针的做法，在判定到有环（即快慢指针相遇后）
+    //将慢指针移动至链表开头，而后二者均以慢速遍历，则下一次相遇必定在环的起点
+    //具体证明后续再写。可百度Flyod算法证明。
+    public ListNode detectCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return null;
+        }
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                slow = head;
+                while (slow != fast) {
+                    slow = slow.next;
+                    fast = fast.next;
+                }
+                return slow;
+            }
+        }
+        return null;
+    }
+
+    //83. 删除排序链表中的重复元素
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode originHead = head;
+        while (head != null) {
+            ListNode cur = head.next;
+            while (cur != null && cur.val == head.val) {
+                cur = cur.next;
+            }
+            head.next = cur;
+            head = cur;
+        }
+        return originHead;
+    }
+
+    //82. 删除排序链表中的重复元素 II
+    public ListNode deleteDuplicates2(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode prev = dummy;
+        ListNode cur = head;
+        while (cur != null) {
+            int count = 0;
+            ListNode tmp = cur;
+            while (tmp.next != null && tmp.next.val == tmp.val) {
+                tmp =tmp.next;
+                count ++;
+            }
+            if (count == 0) {
+                prev = cur;
+            } else {
+                prev.next = tmp.next;
+            }
+            cur = tmp.next;
+        }
+        return dummy.next;
+    }
+
+    //82. 删除排序链表中的重复元素 II(聪明写法)
+    //与我自己写得在本质上没有什么区别，但代码逻辑要简单的多：
+    public ListNode deleteDuplicates3(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode pre = dummy;
+        while (pre.next != null && pre.next.next != null) {
+            if (pre.next.next.val == pre.next.val) {
+                int number = pre.next.val;
+                while (pre.next != null && pre.next.val == number) {
+                    pre.next = pre.next.next;
+                }
+            } else {
+                pre = pre.next;
+            }
+        }
+        return dummy.next;
+    }
+
+
+    //21. 合并两个有序链表(迭代写法)
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode cur = dummy;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                cur.next = new ListNode(l1.val);
+                l1 = l1.next;
+            } else {
+                cur.next = new ListNode(l2.val);
+                l2 = l2.next;
+            }
+            cur = cur.next;
+        }
+        if (l1 == null) {
+            cur.next = l2;
+        } else {
+            cur.next = l1;
+        }
+        return dummy.next;
+    }
+
+    //22. 合并两个有序链表(递归写法)
+    //递归的精髓在于拆解子问题
+    public ListNode mergeTwoLists3(ListNode l1, ListNode l2) {
+        if (l1 == null) {
+            return l2;
+        }
+        if (l2 == null) {
+            return l1;
+        }
+        if (l1.val < l2.val) {
+            //这个条件下，已经确定新链表的头即为l1，接下来的问题只需要确定之后的组成就行：
+            //此时用于考察的链表变为l1.next和l2.
+            l1.next = mergeTwoLists3(l1.next, l2);
+            return l1;
+        } else {
+            //反之亦然
+            l2.next = mergeTwoLists3(l1, l2.next);
+            return l2;
+        }
+    }
+
+    //234. 回文链表(听完具体思路，一遍编写直接AC，😄)
+    //基本思路分三步走：
+    //1. 找到链表中点(这一点最重要，实际采取的方法为快慢指针法，快指针跳2，慢指针跳1)
+    //   这里需要注意，的确存在链表长度为奇数/偶数时，最终fast指针停留为止会有区别,
+    //   但对我们本体中的需求无碍，我们只要保证fast指针最终停留位置的下一个即为下半部分链表的开始即可
+    //   仔细想想，要是以这个为目的的话，链表长度的奇偶其实无所谓。
+    //2. 将后半部分链表翻转(基本操作，无需多讲)
+    //3. 前后链表比较，若有不同，则返回false
+    //   这个地方有个需要注意的点在于，因为奇偶性的原因，后半段链表总是偏短，因此我们的遍历条件应该以后半段链表是否为空为终止条件。
+    public boolean isPalindrome(ListNode head) {
+        if (head == null || head.next == null) {
+            return true;
+        }
+        ListNode fast = head;
+        ListNode slow = head;
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        ListNode newHead = slow.next;
+        while (newHead != null && newHead.next != null) {
+            ListNode tmp = newHead.next;
+            newHead.next = tmp.next;
+            tmp.next = slow.next;
+            slow.next = tmp;
+        }
+        while (slow.next != null) {
+            if (slow.next.val != head.val) {
+                return false;
+            } else {
+                slow = slow.next;
+                head = head.next;
+            }
+        }
+        return true;
+    }
+
+    //61. 旋转链表
+    //这个题最开始我想的是直接将末位k个元素移到头上即可，但没有考虑到k本身可能大于数组长度的问题。
+    //后来自己想了一种方法，AC了，基本思路为遍历先得到链表长度，而后通过取余数计算出等价的k（k < n），
+    //而后在遂行之前的思路即可。
+    //到这里已经实现了O(N)的时间复杂度以及O(1)的空间复杂度，但是代码不简洁
+    //后来看了官方解，用了另一种功能思路，在第一次遍历的过程中，自动将链表练成环
+    //而后得到等价的k后，指针移动到新的链表头处断开即可。
+    public ListNode rotateRight(ListNode head, int k) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode cur = head;
+        int count = 1;
+        while (cur.next != null) {
+            cur = cur.next;
+            count ++;
+        }
+        cur.next = head;
+        int realOffset = k % count;
+        ListNode tmp = head;
+        for (int i = 0; i < count - realOffset - 1; i++) {
+            tmp = tmp.next;
+        }
+        ListNode newHead = tmp.next;
+        tmp.next = null;
+        return newHead;
+    }
+
+    //86. 分隔链表
+    public ListNode partition(ListNode head, int x) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode smaller = new ListNode(x - 1);
+        ListNode originSmall = smaller;
+        ListNode bigger = new ListNode(x + 1);
+        ListNode originBig = bigger;
+        while (head != null) {
+            if (head.val < x) {
+                smaller.next = new ListNode(head.val);
+                smaller = smaller.next;
+            } else {
+                bigger.next = new ListNode(head.val);
+                bigger = bigger.next;
+            }
+            head = head.next;
+        }
+        smaller.next = originBig.next;
+        return originSmall.next;
+    }
+
+
+    //19:删除链表的倒数第n个节点(优化版本)
+    //这个题相较于第一次做增加了一个技巧，就是在原链表头上加一个假节点，用以应对
+    //删除的节点为原头节点的情况。
+    public ListNode removeNthFromEnd2(ListNode head, int n) {
+        if (head == null) {
+            return head;
+        }
+        int idx = 1;
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode tmp = head;
+        ListNode tail = dummy;
+        while (tmp != null) {
+            tmp = tmp.next;
+            idx ++;
+            if (idx > n + 1) {
+                tail = tail.next;
+            }
+        }
+        tail.next = tail.next == null ? null : tail.next.next;
+        return dummy.next;
+    }
+
+    private int[] nums;
+
+    public int pick(int target) {
+        List<Integer> list = new ArrayList<>();
+        Random ran = new Random();
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == target) {
+                list.add(i);
+            }
+        }
+        return list.get(ran.nextInt(list.size()));
+    }
+
+    //380. 常数时间插入、删除和获取随机元素
+    //这个题和之前做的都不同，这个题考察的是一种设计的思想
+    //大致要求是，设计一种数据结构，可在O(1)的时间复杂度内完成插入、删除、随机取一个数的操作
+    //并且，该结构需要具备set的不可重复属性
+    //这里的大体思路是：
+    //首先：
+    //插入、删除需要O(1)，那感觉是需要用到散列表
+    //但是又要求随机取一个数也要O(1)，这个明显又是普通列表才有的特性。
+    //因此，实际上是将普通列表和散列表结合起来使用的。
+    //HashMap用于存储数字和其对应在list中的索引
+    //list来存储真正的数据
+    //这里设计到的一个坑，也是关键点在于！！！！
+    //删除的地方不太好设计：
+    //我们知道，当前条件下，我们是可以直接拿到所需删除元素的索引值的，所以从list中以O(1)的复杂度删除
+    //特定元素并不难，但问题在于，这样，被删除元素之后的元素索引值整体减一，这一点有需要在map中得以体现
+    //这样就失去了O(1)复杂度，因此要换一种思路！！！！
+    //即我们并不真正从list中删除这个元素，而是将所需删除的元素与list的最后一个元素做调换
+    //注意，由于我们不真正删除元素，因此所谓list的最后一个元素，指的是list的最后一个真正有效的元素
+    //这里list的大小实际上是以map的size来做标记的。
+    //当然，还有更为聪明的做法：
+    //！！！
+    //我们可以删除元素，但不是指定的那个，而是list的最后一个元素，同时记录其值，
+    //然后把改值赋给需要删除的对应索引的元素即可。
+    class RandomizedSet {
+
+        private Random ran;
+        private List<Integer> list = new ArrayList<>();
+        private Map<Integer, Integer> map = new HashMap();
+
+        /** Initialize your data structure here. */
+        public RandomizedSet() {
+            ran = new Random();
+        }
+
+        /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
+        public boolean insert(int val) {
+            if (!map.containsKey(val)) {
+                list.add(map.size(), val);
+                map.put(val, list.size() - 1);
+                return true;
+            }
+            return false;
+        }
+
+        /** Removes a value from the set. Returns true if the set contained the specified element. */
+        public boolean remove(int val) {
+            if (map.containsKey(val)) {
+                int tmp = list.get(map.size() - 1);
+                int originIdx = map.get(val);
+                list.set(originIdx, tmp);
+                map.put(tmp, originIdx);
+                map.remove(val);
+                return true;
+            }
+            return false;
+        }
+
+        /** Get a random element from the set. */
+        public int getRandom() {
+            return list.get(ran.nextInt(map.size()));
+        }
+    }
+
+    //蓄水池抽样法 n选1
+    public int pick1(int[] nums) {
+        int res = -1;
+        Random random = new Random();
+        for (int i = 0; i < nums.length; i++) {
+            if (random.nextInt(i + 1) == 0) {
+                res = i;
+            }
+        }
+        return res;
+    }
+
+    //蓄水池抽样法 n选m
+    public int[] pick2(int[] nums, int m) {
+        int[] res = Arrays.copyOf(nums, m);
+        Random ran = new Random();
+        for (int i = m; i < nums.length; i++) {
+            int randomIdx = ran.nextInt(i + 1);
+            if (randomIdx < m) {
+                res[randomIdx] = nums[i];
+            }
+        }
+        return res;
+    }
+
+    //384. 洗牌
+    class Shulffer {
+
+        int[] nums;
+        Random random;
+
+        public Shulffer(int[] nums) {
+            this.nums = nums;
+            random = new Random();
+        }
+
+        /** Resets the array to its original configuration and return it. */
+        public int[] reset() {
+            return nums;
+        }
+
+        /** Returns a random shuffling of the array. */
+        public int[] shuffle() {
+            int[] clone = nums.clone();
+            int N = clone.length;
+            for (int i = 0; i < clone.length; i++) {
+                int ran = random.nextInt(N - i) + i;
+                int tmp = clone[ran];
+                clone[ran] = clone[i];
+                clone[i] = tmp;
+            }
+            return clone;
+        }
+    }
+
+    //381. O(1) 时间插入、删除和获取随机元素 - 允许重复
+    //这题也太鸡儿难了把。。。。。
+    //第一个难点是方法，我想偏了，其实方法就是：
+    //和380类似，还是使用hash表辅助，但是由于本题允许重复，hash表中的value不再是索引，而是索引的集合（key依然为元素值）
+    //然后原始数据结构依然使用ArrayList存储全部元素（主要还是为了最后一步getRandom服务）.
+    //同样，与380相同，最费劲的地方依旧是remove方法：
+    //这里的remove策略与380大体相同，依旧是将需要remove的元素与list中的最后一个元素交换为止后，删除list中的最后一个元素
+    //同时，需要从那个存储元素对应索引值的集合中将上述变化同步。(也就是从被删除元素对应集合中删除原索引，加入最后一个元素的对应集合中，
+    // ！！！最重要的是，同样需要从最终元素的集合中删除原有的最后一个索引值！！！，这句话很重要啊！！！)
+    //第一个难点其实还好，第二个难点就是具体实现了：：
+    //首先上面说半天这个索引集合到底应该选择什么？
+    //最开始我选择的是ArrayList，但很快发现这玩意有个致命漏洞，即为了保证删除元素不影响其他元素的索引
+    //因此我们在删除元素时都需要将其和最后一个元素交换，同时也需要替换索引集合中的对应索引，
+    //List的致命弱点在于，我们在交换时，是无法知道List中到底哪一个索引代表的是数组中最后一个元素的索引(
+    // 照常规而言就是最后一个元素，但实际上在不断的删除操作中，可能会产生变化)
+    //因此，我们必须使用Set，这样就可以很轻松的按照原始List的大小来决定删除哪一个元素了。
+    //当然，这里边还有一大堆涉及到操作顺序的坑，最后经过一个小时的努力，最后终于写除了完全AC的值。
+    //TIPS:针对于Set中不知道具体值，但必须随机删除一个元素是，需要使用迭代器。
+    //我真的好胖胖呢。
+
+    static class RandomizedCollection {
+        private HashMap<Integer, Set<Integer>> mDataMap;
+        private List<Integer> mList;
+        private Random ran;
+        /** Initialize your data structure here. */
+        public RandomizedCollection() {
+            mDataMap = new HashMap<>();
+            mList = new ArrayList<>();
+            ran = new Random();
+        }
+
+        /** Inserts a value to the collection. Returns true if the collection did not already contain the specified element. */
+        public boolean insert(int val) {
+            if (mDataMap.containsKey(val)) {
+                mList.add(val);
+                mDataMap.get(val).add(mList.size() - 1);
+                return false;
+            } else {
+                mList.add(val);
+                Set<Integer> tmp = new HashSet<>();
+                tmp.add(mList.size() - 1);
+                mDataMap.put(val, tmp);
+                return true;
+            }
+        }
+
+        /** Removes a value from the collection. Returns true if the collection contained the specified element. */
+        public boolean remove(int val) {
+            if (!mDataMap.containsKey(val)) {
+                return false;
+            }
+            int tailValue = mList.get(mList.size() - 1);
+            int tailIdx = mList.size() - 1;
+            int tmpIdx = tailIdx;
+            Set<Integer> tailSet = mDataMap.get(tailValue);
+            if (val != tailValue) {
+                Set<Integer> tmp = mDataMap.get(val);
+                Iterator<Integer> it = tmp.iterator();
+                tmpIdx = it.next();
+                it.remove();
+                if (tmp.size() == 0) {
+                    mDataMap.remove(val);
+                }
+                mList.set(tmpIdx, tailValue);
+                tailSet.add(tmpIdx);
+            }
+            tailSet.remove(tailIdx);
+            if (tailSet.size() == 0) {
+                mDataMap.remove(tailValue);
+            }
+            mList.remove(mList.size() - 1);
+            return true;
+        }
+
+        /** Get a random element from the collection. */
+        public int getRandom() {
+            return mList.get(ran.nextInt(mList.size()));
+        }
     }
 
     public static void main(String[] args) {
@@ -2236,9 +2936,20 @@ public class Solution {
 //        int[][] test = {{1, 2, 3, 4},
 //                {5, 6, 7, 8},
 //                {9, 10, 11, 12}};
-        int[] test = {1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 5};
-        System.out.println(solution.binarySearchLeft(test, 3, true));
-
+        int[] test = {1, 2, 3, 4};
+        RandomizedCollection collection = new RandomizedCollection();
+        collection.insert(1);
+        collection.remove(1);
+        collection.insert(2);
+        collection.remove(1);
+//        collection.insert(2);
+//        collection.remove(1);
+//        collection.remove(1);
+//        collection.remove(2);
+//        collection.insert(1);
+//        collection.remove(2);
+        System.out.println(1);
+//        System.out.println(solution.isPalindrome(head));
     }
 
     public static ListNode generateListNodes(int[] nums) {
