@@ -5,10 +5,14 @@ import javafx.util.Pair;
 import org.omg.PortableInterceptor.INACTIVE;
 import sun.print.CUPSPrinter;
 import sun.tools.jstack.JStack;
+import sun.tools.jstat.JStatLogger;
 import sun.tools.jstat.Jstat;
 
+import javax.swing.plaf.IconUIResource;
 import java.sql.Struct;
+import java.time.temporal.ChronoField;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -553,7 +557,7 @@ public class Solution {
         return retList;
     }
 
-    //有效的括号
+    //20. 有效的括号
     public boolean isValid(String s) {
         if (s == null || s.length() % 2 != 0) {
             return false;
@@ -579,6 +583,29 @@ public class Solution {
             }
         }
         return stack.size() == 0;
+    }
+
+    //20. 有效的括号(聪明做法)
+    //这里的改进指出在于存进stack的不是原字符，而是对应的成对字符，这样比较的代码可以写得比较简洁。
+    public boolean isValid1(String s) {
+        if (s == null || s.length() == 0) {
+            return true;
+        }
+        Stack<Character> stack = new Stack<>();
+        for (char c : s.toCharArray()) {
+            if (c == '{') {
+                stack.push('}');
+            } else if (c == '[') {
+                stack.push(']');
+            } else if (c == '(') {
+                stack.push(')');
+            } else {
+                if (stack.isEmpty() || stack.pop() != c) {
+                    return false;
+                }
+            }
+        }
+        return stack.isEmpty();
     }
 
     //22 括号生成
@@ -1618,6 +1645,7 @@ public class Solution {
         return res;
     }
 
+
     public boolean knows(int a, int b) {
         return false;
     }
@@ -2182,6 +2210,7 @@ public class Solution {
         res[0] = index / cols;
         res[1] = index - res[0] * cols;
     }
+
     //34. 在排序数组中查找元素的第一个和最后一个位置
     //这个题的关键点在第一个和最后一个这个东西：
     //对于普通的二分法而言，找到的目标值到底是第一个还是最后一个其实是没有保障的。
@@ -2365,7 +2394,7 @@ public class Solution {
         ListNode originHead = dummy;
         while (curIdx < m - 1) {
             dummy = dummy.next;
-            curIdx ++;
+            curIdx++;
         }
         ListNode head1 = dummy;
         ListNode pre = dummy;
@@ -2423,18 +2452,18 @@ public class Solution {
         dummy.next = head;
         ListNode pre = dummy;
         int idx = 1;
-        while (head.next !=null) {
+        while (head.next != null) {
             if (idx % k == 0) {
                 pre = head;
                 head = head.next;
-                idx ++;
+                idx++;
                 continue;
             }
             ListNode tmp = head.next;
             head.next = tmp.next;
             tmp.next = pre.next;
             pre.next = tmp;
-            idx ++;
+            idx++;
         }
         if (idx % k > 1) {
             head = pre.next;
@@ -2529,8 +2558,8 @@ public class Solution {
             int count = 0;
             ListNode tmp = cur;
             while (tmp.next != null && tmp.next.val == tmp.val) {
-                tmp =tmp.next;
-                count ++;
+                tmp = tmp.next;
+                count++;
             }
             if (count == 0) {
                 prev = cur;
@@ -2660,7 +2689,7 @@ public class Solution {
         int count = 1;
         while (cur.next != null) {
             cur = cur.next;
-            count ++;
+            count++;
         }
         cur.next = head;
         int realOffset = k % count;
@@ -2711,7 +2740,7 @@ public class Solution {
         ListNode tail = dummy;
         while (tmp != null) {
             tmp = tmp.next;
-            idx ++;
+            idx++;
             if (idx > n + 1) {
                 tail = tail.next;
             }
@@ -2762,12 +2791,16 @@ public class Solution {
         private List<Integer> list = new ArrayList<>();
         private Map<Integer, Integer> map = new HashMap();
 
-        /** Initialize your data structure here. */
+        /**
+         * Initialize your data structure here.
+         */
         public RandomizedSet() {
             ran = new Random();
         }
 
-        /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
+        /**
+         * Inserts a value to the set. Returns true if the set did not already contain the specified element.
+         */
         public boolean insert(int val) {
             if (!map.containsKey(val)) {
                 list.add(map.size(), val);
@@ -2777,7 +2810,9 @@ public class Solution {
             return false;
         }
 
-        /** Removes a value from the set. Returns true if the set contained the specified element. */
+        /**
+         * Removes a value from the set. Returns true if the set contained the specified element.
+         */
         public boolean remove(int val) {
             if (map.containsKey(val)) {
                 int tmp = list.get(map.size() - 1);
@@ -2790,7 +2825,9 @@ public class Solution {
             return false;
         }
 
-        /** Get a random element from the set. */
+        /**
+         * Get a random element from the set.
+         */
         public int getRandom() {
             return list.get(ran.nextInt(map.size()));
         }
@@ -2832,12 +2869,16 @@ public class Solution {
             random = new Random();
         }
 
-        /** Resets the array to its original configuration and return it. */
+        /**
+         * Resets the array to its original configuration and return it.
+         */
         public int[] reset() {
             return nums;
         }
 
-        /** Returns a random shuffling of the array. */
+        /**
+         * Returns a random shuffling of the array.
+         */
         public int[] shuffle() {
             int[] clone = nums.clone();
             int N = clone.length;
@@ -2875,14 +2916,19 @@ public class Solution {
         private HashMap<Integer, Set<Integer>> mDataMap;
         private List<Integer> mList;
         private Random ran;
-        /** Initialize your data structure here. */
+
+        /**
+         * Initialize your data structure here.
+         */
         public RandomizedCollection() {
             mDataMap = new HashMap<>();
             mList = new ArrayList<>();
             ran = new Random();
         }
 
-        /** Inserts a value to the collection. Returns true if the collection did not already contain the specified element. */
+        /**
+         * Inserts a value to the collection. Returns true if the collection did not already contain the specified element.
+         */
         public boolean insert(int val) {
             if (mDataMap.containsKey(val)) {
                 mList.add(val);
@@ -2897,7 +2943,9 @@ public class Solution {
             }
         }
 
-        /** Removes a value from the collection. Returns true if the collection contained the specified element. */
+        /**
+         * Removes a value from the collection. Returns true if the collection contained the specified element.
+         */
         public boolean remove(int val) {
             if (!mDataMap.containsKey(val)) {
                 return false;
@@ -2925,31 +2973,1277 @@ public class Solution {
             return true;
         }
 
-        /** Get a random element from the collection. */
+        /**
+         * Get a random element from the collection.
+         */
         public int getRandom() {
             return mList.get(ran.nextInt(mList.size()));
         }
     }
 
+    //138. 复制带随机指针的链表(现在还是一个比较笨的办法，等后面学了回溯再来搞起。)
+    public Node copyRandomList(Node head) {
+        if (head == null) {
+            return head;
+        }
+        Map<Node, Node> map = new HashMap<>();
+        Node dummy = new Node(0);
+        Node cur = dummy;
+        Node originHead = head;
+        while (head != null) {
+            cur.next = new Node(head.val);
+            map.put(head, cur.next);
+            cur = cur.next;
+            head = head.next;
+        }
+        head = originHead;
+        cur = dummy.next;
+        while (head != null) {
+            cur.random = map.get(head.random);
+            cur = cur.next;
+            head = head.next;
+        }
+        return dummy.next;
+    }
+
+    /*---------------------------栈---------------------------*/
+    /*---------------------------栈---------------------------*/
+
+    //71. 简化路径
+    public String simplifyPath(String path) {
+        if (path == null || path.length() == 0) {
+            return path;
+        }
+        String[] pieces = path.split("/");
+        Stack<String> stack = new Stack<>();
+        for (String s :
+                pieces) {
+            if (s.equals(".") || s.length() == 0) {
+                continue;
+            } else if (s.equals("..")) {
+                if (!stack.isEmpty()) {
+                    stack.pop();
+                }
+            } else {
+                stack.push(s);
+            }
+        }
+        StringBuilder res = new StringBuilder();
+        if (stack.isEmpty()) {
+            res.append("/");
+        }
+        while (!stack.isEmpty()) {
+            res.insert(0, "/" + stack.pop());
+        }
+        return res.toString();
+    }
+
+    //394. 字符串解码
+    //这个题的基本思路就是：
+    //1. 首先用栈
+    //2. 其次，因为字符串中有数字和字母组合两种形式，且代表不同意义，均需存储，因此必须使用两个不同的栈来存储。
+    //3. 最后就是最难的实现部分，这个确实还是代码写得少，自己还是没有相处正确解法：
+    //下面这套实现的核心就在于，任意时刻，数字栈中的栈定元素都是当前闭包的重复次数！！！
+    //而字符串栈栈定的元素都是当前闭包之前(上一层闭包之内)的字符串。
+    //上面这些东西自己第一次想的时候都能想个大概，但是结合起来就不行了，还是得看大神的解法
+    //还是需要继续💪💪💪💪💪💪💪💪💪💪💪💪💪💪！！！！！！
+    //总的来说，这个题除了基本思路以外，更多的是考察基本代码能力，还是得继续积累。
+    public String decodeString(String s) {
+        if (s == null || s.length() == 0) {
+            return s;
+        }
+        Stack<Integer> numStack = new Stack<>();
+        Stack<String> stringStack = new Stack<>();
+        int idx = 0;
+        String res = "";
+        while (idx < s.length()) {
+            char ch = s.charAt(idx);
+            if (Character.isDigit(ch)) {
+                int num = 0;
+                while (Character.isDigit(s.charAt(idx))) {
+                    num = num * 10 + s.charAt(idx) - '0';
+                    idx++;
+                }
+                numStack.push(num);
+            } else if (ch == '[') {
+                stringStack.push(res);
+                res = "";
+                idx++;
+            } else if (ch == ']') {
+                StringBuilder tmp = new StringBuilder(stringStack.pop());
+                int count = numStack.pop();
+                for (int i = 0; i < count; i++) {
+                    tmp.append(res);
+                }
+                res = tmp.toString();
+                idx++;
+            } else {
+                res += ch;
+                idx++;
+            }
+        }
+        return res;
+    }
+
+
+    //224. 基本计算器
+    //首先庆祝一波，这个题在学习了课程以后，手撸直接过，😄😄😄😄😄
+    //这个题基本形式与上面那个字符串解码就基本类似了，
+    //就不需要过多的讲解了，
+    //同样是遇到数字就while循环计算整个十进制数字的值
+    //遇到+/-号对符号位进行置位
+    //遇到(入栈，同时将res清零
+    //遇到)出栈，计算当前累计res值.
+    //完美
+    //但是有个东西需要注意一下，就这个题而言，是有优化空间的：
+    //本题中的符号可以使用1/-1表示，由于输入的形式都是合法的，因此我们可以直接将表征符号的数字也压入表征结果的数字栈中
+    //只要按照一定的顺序，压栈/出栈，就能保证连续出栈时，拿到的第一个值就是符号位，第二个值是res。
+    //当然，这里我没有这么改，因为这个东西本质上来说，并不会带来什么太高的好处，对时间/空间复杂的都没有本质上的改进。
+    public int calculate(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        }
+        int res = 0;
+        int signal = 1;
+        int idx = 0;
+        Stack<Integer> stack = new Stack<>();
+        Stack<Integer> signalStack = new Stack<>();
+        while (idx <= s.length() - 1) {
+            char ch = s.charAt(idx);
+            if (ch == '(') {
+                stack.push(res);
+                signalStack.push(signal);
+                res = 0;
+                signal = 1;
+                idx++;
+            } else if (ch == ')') {
+                if (!stack.isEmpty()) {
+                    int num = stack.pop();
+                    int curS = signalStack.pop();
+                    res = curS == 1 ? num + res : num - res;
+                }
+                idx++;
+            } else if (ch == '+') {
+                signal = 1;
+                idx++;
+            } else if (ch == '-') {
+                signal = 2;
+                idx++;
+            } else if (Character.isDigit(ch)) {
+                int num = 0;
+                while (idx <= s.length() - 1 && Character.isDigit(s.charAt(idx))) {
+                    num = num * 10 + s.charAt(idx) - '0';
+                    idx++;
+                }
+                res = signal == 1 ? res + num : res - num;
+            } else {
+                idx++;
+            }
+        }
+        return res;
+    }
+
+    //150. 逆波兰表达式求值
+    public int evalRPN(String[] tokens) {
+        if (tokens == null || tokens.length == 0) {
+            return 0;
+        }
+        Stack<Integer> stack = new Stack<>();
+        for (String s : tokens) {
+            if (s.length() != 1 || Character.isDigit(s.charAt(0))) {
+                int num = Integer.parseInt(s);
+                stack.push(num);
+            } else {
+                int b = stack.pop();
+                int a = stack.pop();
+                if (s.equals("+")) {
+                    stack.push(a + b);
+                } else if (s.equals("-")) {
+                    stack.push(a - b);
+                } else if (s.equals("*")) {
+                    stack.push(a * b);
+                } else if (s.equals("/")) {
+                    stack.push(a / b);
+                }
+            }
+        }
+        return stack.pop();
+    }
+
+    //42. 接雨水
+    //这题太难，先抄个答案，再慢慢理解
+    //为了方便说明，我们将每一个可以装水的区间都称为一个碗
+    //这个解法最难以理解的地方在于，这个栈到底是存了写什么东西
+    //这里，我的理解是，这个栈存的是：尚未当过"碗底"的index。
+    //我们来看啊，从第一个柱子开始，如果整体高度呈现逐渐下降趋势，那么显然尚且不具备装水的条件
+    //因此，这些柱子就会全部被压入，因为显然他们目前不能当作碗底。
+    //而一旦出现一个高于上一个柱子的情况，则进入另一种循环，
+    //此时，显然上一个柱子有可能称为碗底。
+    //那么就把它从栈中推出，以其作为碗底，来计算可以装多少水
+    //这个时候就简单一些了，只要找前一个没有做过碗底的柱子、碗底柱子和当前柱子尝试形成一个碗，试一下能装多少水
+    //这一步完成，继续向前出栈，寻找下一个碗底，这个时候，如果碗底高度还是小于当前柱子，则可以继续做碗底，重复上面的计算
+    //但是，如果是大于等于，则不可以做碗底，本次计算结束，
+    //当前柱子入栈(没有做过碗底)，继续找下一个柱子即可。
+    public int trap(int[] height) {
+        if (height == null || height.length == 0) {
+            return 0;
+        }
+        Stack<Integer> stack = new Stack<>();
+        int res = 0;
+        int idx = 0;
+        while (idx < height.length) {
+            while (!stack.isEmpty() && height[stack.peek()] < height[idx]) {
+                int bot = stack.pop();
+                if (stack.isEmpty()) {
+                    break;
+                }
+                int dis = idx - stack.peek() - 1;
+                int high = Math.min(height[stack.peek()], height[idx]) - height[bot];
+                res += dis * high;
+            }
+            stack.push(idx++);
+        }
+        return res;
+    }
+
+    //
+    public int largestRectangleArea(int[] heights) {
+        if (heights == null || heights.length == 0) {
+            return 0;
+        }
+        Stack<Integer> stack = new Stack<>();
+        int res = 0;
+        int idx = 0;
+        for (int i = 0; i <= heights.length; i++) {
+            int hi = i == heights.length ? 0 : heights[i];
+            while (!stack.isEmpty() && hi < heights[stack.peek()]) {
+                int height = heights[stack.pop()];
+                int start = stack.isEmpty() ? -1 : stack.peek();
+                int area = height * (i - start - 1);
+                res = Math.max(res, area);
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+
+
+    //155. 最小栈
+    class MinStack {
+
+        Stack<Integer> stack;
+        Stack<Integer> minStack;
+        int min = Integer.MAX_VALUE;
+
+        /**
+         * initialize your data structure here.
+         */
+        public MinStack() {
+            stack = new Stack<>();
+            minStack = new Stack<>();
+        }
+
+        public void push(int x) {
+            stack.push(x);
+            if (x <= min) {
+                minStack.push(min);
+                min = x;
+            }
+        }
+
+        public void pop() {
+            int t = stack.pop();
+            if (t == min) {
+                min = minStack.pop();
+            }
+        }
+
+        public int top() {
+            return stack.peek();
+        }
+
+        public int getMin() {
+            return min;
+        }
+    }
+
+    //232. 用栈实现队列
+    class MyQueue {
+
+        Stack<Integer> mainStack;
+        Stack<Integer> subStack;
+
+        /**
+         * Initialize your data structure here.
+         */
+        public MyQueue() {
+            mainStack = new Stack<>();
+            subStack = new Stack<>();
+        }
+
+        /**
+         * Push element x to the back of queue.
+         */
+        public void push(int x) {
+            mainStack.push(x);
+        }
+
+        /**
+         * Removes the element from in front of queue and returns that element.
+         */
+        public int pop() {
+            if (subStack.isEmpty()) {
+                while (!mainStack.isEmpty()) {
+                    subStack.push(mainStack.pop());
+                }
+            }
+            return subStack.pop();
+        }
+
+        /**
+         * Get the front element.
+         */
+        public int peek() {
+            if (subStack.isEmpty()) {
+                while (!mainStack.isEmpty()) {
+                    subStack.push(mainStack.pop());
+                }
+            }
+            return subStack.peek();
+        }
+
+        /**
+         * Returns whether the queue is empty.
+         */
+        public boolean empty() {
+            return mainStack.isEmpty() && subStack.isEmpty();
+        }
+    }
+
+    //225. 用队列实现栈
+    class MyStack {
+
+        private Queue<Integer> queue1;
+        private Queue<Integer> queue2;
+
+        /**
+         * Initialize your data structure here.
+         */
+        public MyStack() {
+            queue1 = new LinkedList<>();
+            queue2 = new LinkedList<>();
+        }
+
+        /**
+         * Push element x onto stack.
+         */
+        public void push(int x) {
+            queue2.offer(x);
+            while (!queue1.isEmpty()) {
+                queue2.offer(queue1.poll());
+            }
+            Queue<Integer> tmp = null;
+            tmp = queue1;
+            queue1 = queue2;
+            queue2 = tmp;
+
+        }
+
+        /**
+         * Removes the element on top of the stack and returns that element.
+         */
+        public int pop() {
+            return queue1.poll();
+        }
+
+        /**
+         * Get the top element.
+         */
+        public int top() {
+            return queue1.peek();
+        }
+
+        /**
+         * Returns whether the stack is empty.
+         */
+        public boolean empty() {
+            return queue1.isEmpty();
+        }
+    }
+
+    //227. 表达式计算
+    //基本思路如下：
+    //这个题与224类似，但是需要追加考虑优先级的问题，乘除优先级高于加减
+    //同样采用两个栈——符号栈和数字栈
+    //先说说大概过程，就是先计算所有的乘除法，最后计算加减法，具体过程如下：
+    //就是遇到+-*/都不用管，直接过
+    //遇到数字，先迭代计算除他的值，而后判断符号栈顶的元素：
+    //如果是*/则循环计算知道栈顶不是*/，将计算结果压如数字栈顶。
+    //最后栈中剩余数字做加减法即可：
+    //这个加减法的方法是，通过判断符号栈为+/-给数字栈顶元素加正负号进行相加即可。
+    public int calculate2(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        }
+        Stack<Character> signals = new Stack<>();
+        Stack<Integer> nums = new Stack<>();
+        int idx = 0;
+        while (idx < s.length()) {
+            char ch = s.charAt(idx);
+            if (ch == '*' || ch == '/') {
+                signals.push(ch);
+                idx++;
+            } else if (ch == '+' || ch == '-') {
+                signals.push(ch);
+                idx++;
+            } else if (Character.isDigit(ch)) {
+                int temp = 0;
+                while (idx < s.length() && Character.isDigit(s.charAt(idx))) {
+                    temp = temp * 10 + s.charAt(idx) - '0';
+                    idx++;
+                }
+                nums.push(temp);
+                while (!signals.isEmpty() && (signals.peek() == '*' || signals.peek() == '/')) {
+                    int ac = nums.pop();
+                    char signal = signals.pop();
+                    if (signal == '*') {
+                        nums.push(nums.pop() * ac);
+                    } else {
+                        nums.push(nums.pop() / ac);
+                    }
+                }
+            } else {
+                idx++;
+            }
+        }
+        int res = 0;
+        while (!signals.isEmpty()) {
+            if (signals.pop() == '+') {
+                res += nums.pop();
+            } else {
+                res += -nums.pop();
+            }
+        }
+        return res + nums.pop();
+    }
+
+    //165. 比较版本号
+    public int compareVersion(String version1, String version2) {
+        String[] s1 = version1.split("\\.");
+        String[] s2 = version2.split("\\.");
+        int i = 0;
+        for (i = 0; i < Math.max(s1.length, s2.length); i++) {
+            int v1 = i >= s1.length ? 0 : StringToIntIgnoreZero(s1[i]);
+            int v2 = i >= s2.length ? 0 : StringToIntIgnoreZero(s2[i]);
+            if (v1 > v2) {
+                return 1;
+            } else if (v1 < v2) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    public int StringToIntIgnoreZero(String s) {
+        int res = 0;
+        int i = 0;
+        while (i < s.length() && s.charAt(i) == '0') i++;
+        for (int j = i; j < s.length(); j++) {
+            res += 10 * res + s.charAt(j) - '0';
+        }
+        return res;
+    }
+
+    //168 Excel列表名称
+    public String convertToTitle(int n) {
+        StringBuilder builder = new StringBuilder();
+        while (n > 0) {
+            int tmp = (n - 1) % 26;
+            n = (n - 1) / 26;
+            builder.insert(0, (char) (tmp + 'A'));
+        }
+        return builder.toString();
+    }
+
+    //242. 有效的字母异位词(笨办法)
+    public boolean isAnagram(String s, String t) {
+        if (s == null || t == null || s.length() != t.length()) {
+            return false;
+        }
+        int[] sList = new int[26];
+        int[] tList = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            sList[s.charAt(i) - 'a']++;
+            tList[t.charAt(i) - 'a']++;
+        }
+        for (int i = 0; i < 26; i++) {
+            if (sList[i] != tList[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //242. 有效的字母异位词(升级方法)
+    //空间复杂度更低，只使用一个辅助数组，具体方法为一个字符串做+计数，另一个做-计数
+    //结果辅助数组全0，则为true 反之则为false
+    public boolean isAnagram2(String s, String t) {
+        if (s == null || t == null || s.length() != t.length()) {
+            return false;
+        }
+        int[] sList = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            sList[s.charAt(i) - 'a']++;
+            sList[t.charAt(i) - 'a']--;
+        }
+        for (int l :
+                sList) {
+            if (l != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //76. 最小覆盖子串(笨办法，超时)
+    public String minWindow(String s, String t) {
+        List<Integer> template = new ArrayList<>();
+        int[] templateList = new int[52];
+        for (char ch :
+                t.toCharArray()) {
+            template.add(getCharIndex(ch));
+            templateList[getCharIndex(ch)]++;
+        }
+        int[] tmp = new int[52];
+        int start = 0;
+        int end = 0;
+        tmp[getCharIndex(s.charAt(0))]++;
+        int resLength = s.length();
+        int resStart = 0;
+        boolean isValid = false;
+        while (start <= end && end < s.length()) {
+            while (start <= end && isTemplateValid(tmp, template, templateList)) {
+                isValid = true;
+                if (end - start + 1 < resLength) {
+                    resLength = end - start + 1;
+                    resStart = start;
+                }
+                tmp[getCharIndex(s.charAt(start))]--;
+                start++;
+            }
+            while (end < s.length() - 1 && !isTemplateValid(tmp, template, templateList)) {
+                end++;
+                tmp[getCharIndex(s.charAt(end))]++;
+            }
+            if (end == s.length() - 1 && !isTemplateValid(tmp, template, templateList)) {
+                break;
+            }
+        }
+        return isValid ? s.substring(resStart, resStart + resLength) : "";
+    }
+
+    public int getCharIndex(char ch) {
+        if (ch >= 'a') {
+            return (ch - 'a' + 26);
+        } else {
+            return (ch - 'A');
+        }
+    }
+
+    public boolean isTemplateValid(int[] tmp, List<Integer> template, int[] templateList) {
+        boolean res = true;
+        for (int a :
+                template) {
+            if (tmp[a] < templateList[a]) {
+                return false;
+            }
+        }
+        return res;
+    }
+
+    //76. 最小覆盖子串(好办法办法，超时)
+    //与上面那个笨办法对比，其实思路已经对了，先说下基本思路
+    //其实就是滑动窗口：
+    //两个指针一个start，一个end，均初始化为0
+    //总体上的循环是每次都向前推end，直至遍历完成：
+    //这个过程中，每次碰到[start, end]之间的字符串满足条件（这里很重要）
+    //则一步步向前推start，直到条件不满足，则继续下一步推end；
+    //这个过程中，不断更新满足条件的最短子串长度以及其对应起始点。
+    //这样，遍历完成时，最短子串就出现了。
+    //这个聪明办法的关键在于这个判断满足条件的方法：
+    //之前我的本办法是每次判断都需要遍历整个计数排序数组，确认与对应为止的字符个数均>=模版，则满足。
+    //这样引入的时间复杂度过高。、
+    //聪明办法采用的方式是，始终保持一个remainLen作为还需要匹配的字符个数，初始化为t的长度。
+    //首先需对计数排序数组进行编码，遍历t，不断++完成初始化。
+    //接下来，在更新过程中，end向右推时，每遇到一个字符，均对原计数排序数组对应位置-1；
+    //这里，如果该字符在t中存在，则原位置数字应>0，此时-1时还需将remainLen-1(匹配成功一个字符，所需匹配字符-1)；
+    //反之，若原位置字符不存在，仅-1，不需要更新remainLen。
+    //这样就可以通过remainLen是否为0来判断是否满足条件。
+    //若满足条件，则进入推动start的循环。
+    //这个循环中，每次满足条件，均需更新最小子串长度及对应start
+    //这里同样，推动start时候，如果被推出的字符在t中存在，则remainLen+1;
+    //反之则正常推除，remainLen不需要处理。
+    //如此，即可大大节省时间。
+    public String minWindow1(String s, String t) {
+        //还需匹配的字符总数
+        int remainLen = t.length();
+        int start = 0;
+        int end = 0;
+        int[] count = new int[256];
+        for (char a : t.toCharArray()) {
+            count[a]++;
+        }
+        int resLen = Integer.MAX_VALUE;
+        int resStart = 0;
+        for (start = 0, end = 0; end < s.length(); end++) {
+            //这个条件只有当前元素在t中存在时才会满足，因此此时可以将所需匹配长度-1
+            if (count[s.charAt(end)]-- > 0) {
+                remainLen--;
+            }
+            while (remainLen == 0) {
+                if (end - start + 1 < resLen) {
+                    resLen = end - start + 1;
+                    resStart = start;
+                }
+                if (++count[s.charAt(start++)] > 0) {
+                    remainLen++;
+                }
+            }
+        }
+        return resLen == Integer.MAX_VALUE ? "" : s.substring(resStart, resStart + resLen);
+    }
+
+    //32. 最长有效括号
+    public int longestValidParentheses(String s) {
+        Stack<Integer> stack = new Stack<>();
+        //当前考察子串始终为(j, i]
+        int res = 0;
+        for (int i = 0, j = -1; i < s.length(); i++) {
+            if (s.charAt(i) == '(') {
+                stack.push(i);
+            } else {
+                //到这里已经无法匹配括号了，上一轮结束，下一轮开始，将j定位至当前即可。
+                if (stack.isEmpty()) {
+                    j = i;
+                } else {
+                    stack.pop();
+                    if (stack.isEmpty()) {
+                        res = Math.max(res, i - j);
+                    } else {
+                        res = Math.max(res, i - stack.peek());
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    //125. 验证回文串
+    public boolean isPalindrome(String s) {
+        if (s == null || s.length() == 0) {
+            return true;
+        }
+        int start = 0;
+        int end = s.length() - 1;
+        while (start <= end) {
+            while (start < s.length() && !Character.isLetterOrDigit(s.charAt(start))) {
+                start++;
+            }
+            while (end >= start && !Character.isLetterOrDigit(s.charAt(end))) {
+                end--;
+            }
+            if (start > end) {
+                return true;
+            }
+            char s1 = s.charAt(start);
+            char s2 = s.charAt(end);
+            if (s1 != s2 && Character.toLowerCase(s1) != Character.toLowerCase(s2)) {
+                return false;
+            } else {
+                start++;
+                end--;
+            }
+        }
+        return true;
+    }
+
+    //392. 判断子序列
+    public boolean isSubsequence(String s, String t) {
+        int temp = 0;
+        if (s == null || s.length() == 0) {
+            return true;
+        }
+        if (t == null || t.length() == 0) {
+            return false;
+        }
+        for (int i = 0; i < t.length(); i++) {
+            if (t.charAt(i) == s.charAt(temp)) {
+                temp++;
+                if (temp == s.length()) {
+                    return true;
+                }
+            }
+        }
+        return temp == t.length();
+    }
+
+    //246. 中心对称数
+    public boolean isStrobogrammatic(String num) {
+        if (num == null || num.length() == 0) {
+            return false;
+        }
+        HashMap<Character, Character> map = new HashMap<>();
+        map.put('0', '0');
+        map.put('1', '1');
+        map.put('6', '9');
+        map.put('8', '8');
+        map.put('9', '6');
+        int start = 0;
+        int end = num.length() - 1;
+        while (start <= end) {
+            char chs = num.charAt(start);
+            char che = num.charAt(end);
+            if (!(map.containsKey(chs) && che == map.get(chs))) {
+                return false;
+            }
+            start++;
+            end--;
+        }
+        return true;
+    }
+
+    public String countAndSay(int n) {
+        String res = "1";
+        for (int i = 1; i < n; i++) {
+            res = nextQoute(res);
+        }
+        return res;
+    }
+
+    public String nextQoute(String s) {
+        int count = 0;
+        char cur = s.charAt(0);
+        int idx = 0;
+        StringBuilder sb = new StringBuilder();
+        while (idx < s.length()) {
+            cur = s.charAt(idx);
+            while (idx < s.length() && s.charAt(idx) == cur) {
+                count++;
+                idx++;
+            }
+            sb.append((char) (count + '0')).append(cur);
+            count = 0;
+        }
+        return sb.toString();
+    }
+
+    //48. 字母异位分词
+    //这个是官方解，总的来说字母异位分词还是用计数排序来搞最优
+    //但是官方的高明指出在于使用HashMap来进行不同类型分词的记录
+    //并且使用每个单词对应的计数排序数组编码作为key(这样对每一类分词都有一个独一无二的key)
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<String>> resMap = new HashMap<>();
+        for (String os : strs) {
+            int[] tmp = new int[26];
+            for (char c : os.toCharArray()) {
+                tmp[c - 'a']++;
+            }
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < tmp.length; i++) {
+                if (tmp[i] > 0) {
+                    sb.append((char) (i + 'a')).append("*").append(tmp[i]);
+                }
+            }
+            if (!resMap.containsKey(sb.toString())) {
+                resMap.put(sb.toString(), new ArrayList<>());
+            }
+            resMap.get(sb.toString()).add(os);
+        }
+        return new ArrayList<>(resMap.values());
+    }
+
+    //3. 无重复字符的最长子串
+    public int lengthOfLongestSubstring2(String s) {
+        int res = 0;
+        HashMap<Character, Integer> map = new HashMap<>();
+        int idx = 0;
+        int cur = 0;
+        while (idx < s.length()) {
+            while (idx < s.length() && !map.containsKey(s.charAt(idx))) {
+                map.put(s.charAt(idx), idx);
+                idx++;
+            }
+            res = Math.max(res, map.size());
+            if (idx == s.length()) {
+                break;
+            }
+            int tmp = map.get(s.charAt(idx));
+            for (int i = cur; i <= tmp; i++) {
+                map.remove(s.charAt(i));
+            }
+            cur = tmp + 1;
+        }
+        return res;
+    }
+
+    //266. 回文排列
+    public boolean canPermutePalindrome(String s) {
+        int[] mode = new int[256];
+        for (char ch :
+                s.toCharArray()) {
+            mode[ch]++;
+        }
+        boolean single = false;
+        for (int t :
+                mode) {
+            if (single && t % 2 == 1) {
+                return false;
+            } else if (!single && t % 2 == 1) {
+                single = true;
+            }
+        }
+        return true;
+    }
+
+    //215. 数组中的第K个最大元素
+    public int findKthLargest(int[] nums, int k) {
+        if (nums == null || k > nums.length) {
+            return 0;
+        }
+        PriorityQueue<Integer> queue = new PriorityQueue<Integer>();
+        for (int i :
+                nums) {
+            queue.offer(i);
+            if (queue.size() > k) {
+                queue.poll();
+            }
+        }
+        return queue.poll();
+    }
+
+
+    public int[][] merge2(int[][] intervals) {
+        if (intervals == null || intervals.length == 0) {
+            return intervals;
+        }
+        List<int[]> res = new ArrayList<>();
+        Arrays.sort(intervals, Comparator.comparingInt(o -> o[0]));
+        int start = intervals[0][0];
+        int end = intervals[0][1];
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][0] <= end) {
+                end = Math.max(end, intervals[i][1]);
+            } else {
+                res.add(new int[]{start, end});
+                start = intervals[i][0];
+                end = intervals[i][1];
+            }
+        }
+        res.add(new int[]{start, end});
+        return res.toArray(new int[][]{});
+    }
+
+    //373. 查找和最小的K对数字
+    //这个题的基调是优先队列不但给入，最后只去前k个即可，
+    //但这个题时间复杂度的关键在于，遍历的方式：
+    //我先后经历了全部遍历，仅遍历每个数组的前k个等方法：
+    //但这些都不是最优的，下面这个才是最优的：
+    //基本策略是，先将nums1中的前k个与num2中第0个组成par压入最小堆(同时将每个pair对应的nums2的index压入)；
+    //之后逐步去除队列中的pair加入到返回列表中：
+    //每次去一个pair，就针对这个pair，保持nums1索取数不变，num2所取数的index向右退役一位的形式，将对应pair及索引压入。
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums1.length == 0 || nums2.length == 0 || k == 0) {
+            return res;
+        }
+        PriorityQueue<int[]> queue = new PriorityQueue<int[]>((o1, o2) -> o1[0] + o1[1] - o2[0] - o2[1]);
+        for (int i = 0; i < nums1.length && i < k; i++) {
+            queue.add(new int[]{nums1[i], nums2[0], 0});
+        }
+        while (!queue.isEmpty() && k-- > 0) {
+            int[] cur = queue.poll();
+            res.add(new ArrayList<>(Arrays.asList(cur[0], cur[1])));
+            if (cur[2] == nums2.length - 1) continue;
+            queue.add(new int[]{cur[0], nums2[cur[2] + 1], cur[2] + 1});
+        }
+        return res;
+    }
+
+
+    //88. 合并两个有序数组
+    //这个鬼东西，逻辑本身很简单，就是从nums1的末端（合并后的索引）开始
+    //从后向前，每次都取两个数组尾巴上的较大值，
+    //如此这边，最终一定会有一个数组的数字先被取完，这个时候就直接将身下一个数组的数字补到开头即可。
+    /*难点在于怎么将最开始臃肿的代码省略回到这个地方。*/public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int idx = m + n - 1;
+        int idx1 = m - 1;
+        int idx2 = n - 1;
+        while (idx >= 0 & idx1 >= 0 && idx2 >= 0) {
+            nums1[idx--] = nums1[idx1] >= nums2[idx2] ? nums1[idx1--] : nums2[idx2--];
+        }
+        while (idx >= 0) {
+            nums1[idx--] = idx1 >= 0 ? nums1[idx1--] : nums2[idx2--];
+        }
+    }
+
+    //347. 前 K 个高频元素
+    public int[] topKFrequent(int[] nums, int k) {
+        List<Integer> res = new ArrayList<>();
+        if (nums == null || nums.length == 0 || k == 0) {
+            return res.stream().mapToInt(Integer::valueOf).toArray();
+        }
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int num : nums) {
+            if (map.containsKey(num)) {
+                map.put(num, map.get(num) + 1);
+            } else {
+                map.put(num, 1);
+            }
+        }
+        PriorityQueue<int[]> queue = new PriorityQueue<>(Comparator.comparingInt(o -> o[1]));
+        for (int key : map.keySet()) {
+            queue.offer(new int[]{key, map.get(key)});
+            if (queue.size() > k) {
+                queue.poll();
+            }
+        }
+        while (!queue.isEmpty()) {
+            res.add(queue.poll()[0]);
+        }
+        return res.stream().mapToInt(Integer::valueOf).toArray();
+    }
+    //46. 全排列
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        helper(res, new ArrayList<>(), nums);
+        return res;
+    }
+
+    public void helper(List<List<Integer>> res, List<Integer> numsList, int[] nums) {
+        if (numsList.size() == nums.length) {
+            res.add(new ArrayList<>(numsList));
+            return;
+        }
+        for (int num:
+                nums) {
+            if (numsList.contains(num)) {
+                continue;
+            }
+            numsList.add(num);
+            helper(res, numsList, nums);
+            numsList.remove(numsList.size() - 1);
+        }
+    }
+
+    //17. 电话号码的字母组合
+    public List<String> letterCombinations2(String digits) {
+        List<String> res = new ArrayList<>();
+        if (digits == null || digits.length() == 0) {
+            return res;
+        }
+        int count = digits.length();
+        StringBuilder sb = new StringBuilder();
+        getDigitHelp(res, sb, 0, digits);
+        return res;
+    }
+
+    public void getDigitHelp(List<String> res, StringBuilder sb, int count, String digit) {
+        if (count == digit.length()) {
+            res.add(sb.toString());
+            System.out.println(sb.toString());
+            return;
+        }
+        char c = digit.charAt(count);
+        List<Character> test = testList.get(c - '2');
+        count ++;
+        for (char ch:
+                test) {
+            sb.append(ch);
+            getDigitHelp(res, sb , count, digit);
+            sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+
+    //78. 子集
+    public List<List<Integer>> subsets2(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        List<Integer> cache = new ArrayList<>();
+        subSetsHelper(res, nums, cache, 0);
+        return res;
+    }
+
+    public void subSetsHelper(List<List<Integer>> res, int[] nums, List<Integer> cache, int curIdx){
+        res.add(new ArrayList<>(cache));
+        for (int i = curIdx; i < nums.length; i++) {
+            cache.add(nums[i]);
+            subSetsHelper(res, nums, cache, i + 1);
+            cache.remove(cache.size() - 1);
+        }
+    }
+
+    //77. 组合
+    //这个还是基本的回溯法（剪枝dfs），但是这个题有个小技巧
+    //多加一个越界判断，可以省很多时间复杂度
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (k == 0 || n == 0) {
+            return res;
+        }
+        combineHelper(res, new ArrayList<Integer>(), k, n, 1);
+        return res;
+    }
+
+    public void combineHelper(List<List<Integer>> res, List<Integer> cache, int remainCount, int base,
+                              int idx) {
+        if (remainCount == 0) {
+            res.add(new ArrayList<>(cache));
+            return;
+        }
+        //越界判断在这里。
+        if (idx > base - remainCount + 1) {
+            return;
+        }
+        for (int i = idx; i <= base; i++) {
+            cache.add(i);
+            combineHelper(res, cache, remainCount - 1, base, i + 1);
+            cache.remove(cache.size() - 1);
+        }
+    }
+
+    //47. 全排列 II
+    //这个地方顺手改进了46题普通全排列的算法
+    //原来的回溯法在进行剪枝dfs时，为了方便最后一步剪枝，必须使用list结构存储已挑选的元素(这样只需直接删除list的最后一个元素即可)
+    //这就引入了新的问题，排列过程需要判断当前元素是否已经选中过，如果用list，需要遍历判断，所需时间过长
+    //由此引入一个新的机制，直接使用一个list存储全部元素，使用一个指针指向当前已经选中的元素个数对应位置（如当前以选中3个，则指针指向第三个元素）
+    //在进行下一选择时，可直接从第3+1个元素开始遍历选起，每次选择完毕以后，将选中的元素与第3+1个元素交换，即可维持该数据结构。
+    //之后在进行剪枝的时候，就可以方向操作之前的交换即可，这样做的另一个好处就是，用来标记的这个list在遍历完一边后，可直接加入答案数组。
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        List<Integer> tags = new ArrayList<>();
+        for (int num:
+             nums) {
+            tags.add(num);
+        }
+
+        permuteUniqueHelper(res, tags,  0, 0);
+        return res;
+    }
+
+    public void permuteUniqueHelper(List<List<Integer>> res, List<Integer> tags, int curIdx, int n) {
+        if (n == tags.size()) {
+            res.add(new ArrayList<>(tags));
+        }
+        Set<Integer> set = new HashSet<>();
+        for (int i = curIdx; i < tags.size(); i++) {
+            if (set.contains(tags.get(i))) {
+                continue;
+            }
+            set.add(tags.get(i));
+            Collections.swap(tags, curIdx, i);
+            permuteUniqueHelper(res, tags, curIdx + 1, n + 1);
+            Collections.swap(tags, curIdx, i);
+        }
+    }
+
+    //60. 排列序列
+    //丢，这题的回溯主要考察的还是逻辑思维能力把。
+    //基本思路是，对于n个数的全排列而言，首位的会有n种可能行
+    //且每一种可能性都有(n - 1)!种情况。
+    //由此，对于一个n的全排列种的第k个数，其首位数字是可以计算出来的。
+    //首位数字计算完成后，问题进一步转为为一个子问题
+    //如此以此类推，递归调用即可得到最终的结果。
+    public String getPermutation(int n, int k) {
+        StringBuilder sb = new StringBuilder();
+        List<Integer> list = new ArrayList<>();
+        for (int i = 1; i <= n; i++) {
+            list.add(i);
+        }
+        getPermutationHelper(sb, list, n, k, n, getRanking(n));
+        return sb.toString();
+    }
+
+    public void getPermutationHelper(StringBuilder sb, List<Integer> cache, int n, int k, int base, int cacheRank) {
+        if (sb.length() == base) {
+            return;
+        }
+        int x = n != 0 ? cacheRank / n : 1;
+        int rank1 = (k - 1) / x;
+        int rank2 = (k - 1) % x;
+        sb.append(cache.remove(rank1));
+        getPermutationHelper(sb, cache, n - 1, rank2 + 1, base, x);
+    }
+
+
+    public int getRanking(int n) {
+        if (n == 1 || n == 0) {
+            return 1;
+        } else {
+            return n * getRanking(n - 1);
+        }
+    }
+
+    //90. 子集2
+    //基本套路与子集1几乎完全相同，加了个重复条件的秘诀就在于，在同一层级的遍历中排除相同元素即可。还有就是要注意需要排序的。
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        Arrays.sort(nums);
+        subsetsWithDupHelper(res, new ArrayList<Integer>(), nums, 0);
+        return res;
+    }
+
+    public void subsetsWithDupHelper(List<List<Integer>> res, List<Integer> cache, int[] nums, int curIdx) {
+        res.add(new ArrayList<>(cache));
+        for (int i = curIdx; i < nums.length; i++) {
+            if (i > curIdx && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            cache.add(nums[i]);
+            subsetsWithDupHelper(res, cache, nums, i + 1);
+            cache.remove(cache.size() - 1);
+        }
+    }
+
+    //39. 组合总和
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (candidates == null || candidates.length == 0) {
+            return res;
+        }
+        Arrays.sort(candidates);
+        combinationSumHelper(res, new ArrayList<Integer>(), candidates, target, 0);
+        return res;
+    }
+
+    public void combinationSumHelper(List<List<Integer>> res, List<Integer> cache, int[] candidates, int target, int curIdx) {
+        if (target == 0) {
+            res.add(new ArrayList<>(cache));
+            return;
+        } else if (target < 0) {
+            return;
+        }
+        if (curIdx > candidates.length - 1) {
+            return;
+        }
+        combinationSumHelper(res, cache, candidates, target, curIdx + 1);
+        if (target - candidates[curIdx] >= 0) {
+            cache.add(candidates[curIdx]);
+            combinationSumHelper(res, cache, candidates, target - candidates[curIdx], curIdx);
+            cache.remove(cache.size() - 1);
+        }
+    }
+
+    //40. 组合总和 II(我的算法)
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (candidates == null || candidates.length == 0) {
+            return res;
+        }
+        Arrays.sort(candidates);
+        combination2SumHelper(res, new ArrayList<>(), candidates, target, 0);
+        return res;
+    }
+
+    public void combination2SumHelper(List<List<Integer>> res, List<Integer> cache, int[] candidates, int target, int curIdx) {
+        if (target == 0) {
+            res.add(new ArrayList<>(cache));
+            return;
+        }
+        if (target < 0 || curIdx > candidates.length - 1) {
+            return;
+        }
+        for (int i = curIdx; i < candidates.length; i++) {
+            if (i > curIdx && candidates[i] == candidates[i - 1]) {
+                continue;
+            }
+            cache.add(candidates[i]);
+            combination2SumHelper(res, cache, candidates, target - candidates[i], i + 1);
+            cache.remove(cache.size() - 1);
+        }
+    }
+
+    //40. 组合总和 II(优化算法)
+    List<int[]> freq = new ArrayList<int[]>();
+    List<List<Integer>> ans = new ArrayList<List<Integer>>();
+    List<Integer> sequence = new ArrayList<Integer>();
+
+    public List<List<Integer>> combinationSum21(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        for (int num : candidates) {
+            int size = freq.size();
+            if (freq.isEmpty() || num != freq.get(size - 1)[0]) {
+                freq.add(new int[]{num, 1});
+            } else {
+                ++freq.get(size - 1)[1];
+            }
+        }
+        dfs(0, target);
+        return ans;
+    }
+
+    public void dfs(int pos, int rest) {
+        if (rest == 0) {
+            ans.add(new ArrayList<Integer>(sequence));
+            return;
+        }
+        if (pos == freq.size() || rest < freq.get(pos)[0]) {
+            return;
+        }
+
+        dfs(pos + 1, rest);
+
+        int most = Math.min(rest / freq.get(pos)[0], freq.get(pos)[1]);
+        for (int i = 1; i <= most; ++i) {
+            sequence.add(freq.get(pos)[0]);
+            dfs(pos + 1, rest - i * freq.get(pos)[0]);
+        }
+        for (int i = 1; i <= most; ++i) {
+            sequence.remove(sequence.size() - 1);
+        }
+    }
+
+    //216. 组合总和 III
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        List<List<Integer>> res = new ArrayList<>();
+        combinationSum3Helper(res, new ArrayList<>(), n, k, 1);
+        return res;
+    }
+
+    public void combinationSum3Helper(List<List<Integer>> res, List<Integer> cache, int target, int count, int curValue) {
+        if (target == 0 && count == 0) {
+            res.add(new ArrayList<>(cache));
+            return;
+        }
+        if (target > count * 9 || target < count) {
+            return;
+        }
+        if (curValue > 9) {
+            return;
+        }
+        for (int i = curValue; i < 10; i++) {
+            cache.add(i);
+            combinationSum3Helper(res, cache, target - i, count - 1, i + 1);
+            cache.remove(cache.size() - 1);
+        }
+    }
+
+
     public static void main(String[] args) {
         Solution solution = new Solution();
-//        int[][] test = {{1, 2, 3, 4},
-//                {5, 6, 7, 8},
-//                {9, 10, 11, 12}};
-        int[] test = {1, 2, 3, 4};
-        RandomizedCollection collection = new RandomizedCollection();
-        collection.insert(1);
-        collection.remove(1);
-        collection.insert(2);
-        collection.remove(1);
-//        collection.insert(2);
-//        collection.remove(1);
-//        collection.remove(1);
-//        collection.remove(2);
-//        collection.insert(1);
-//        collection.remove(2);
-        System.out.println(1);
-//        System.out.println(solution.isPalindrome(head));
+        int[] test = new int[]{10,1,2,7,6,1,5};
+        System.out.println(solution.combinationSum3(3, 24));
     }
 
     public static ListNode generateListNodes(int[] nums) {
