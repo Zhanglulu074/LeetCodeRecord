@@ -3875,7 +3875,8 @@ public class Solution {
     //这个鬼东西，逻辑本身很简单，就是从nums1的末端（合并后的索引）开始
     //从后向前，每次都取两个数组尾巴上的较大值，
     //如此这边，最终一定会有一个数组的数字先被取完，这个时候就直接将身下一个数组的数字补到开头即可。
-    /*难点在于怎么将最开始臃肿的代码省略回到这个地方。*/public void merge(int[] nums1, int m, int[] nums2, int n) {
+    /*难点在于怎么将最开始臃肿的代码省略回到这个地方。*/
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
         int idx = m + n - 1;
         int idx1 = m - 1;
         int idx2 = n - 1;
@@ -3913,6 +3914,7 @@ public class Solution {
         }
         return res.stream().mapToInt(Integer::valueOf).toArray();
     }
+
     //46. 全排列
     public List<List<Integer>> permute(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
@@ -3928,7 +3930,7 @@ public class Solution {
             res.add(new ArrayList<>(numsList));
             return;
         }
-        for (int num:
+        for (int num :
                 nums) {
             if (numsList.contains(num)) {
                 continue;
@@ -3959,11 +3961,11 @@ public class Solution {
         }
         char c = digit.charAt(count);
         List<Character> test = testList.get(c - '2');
-        count ++;
-        for (char ch:
+        count++;
+        for (char ch :
                 test) {
             sb.append(ch);
-            getDigitHelp(res, sb , count, digit);
+            getDigitHelp(res, sb, count, digit);
             sb.deleteCharAt(sb.length() - 1);
         }
     }
@@ -3979,7 +3981,7 @@ public class Solution {
         return res;
     }
 
-    public void subSetsHelper(List<List<Integer>> res, int[] nums, List<Integer> cache, int curIdx){
+    public void subSetsHelper(List<List<Integer>> res, int[] nums, List<Integer> cache, int curIdx) {
         res.add(new ArrayList<>(cache));
         for (int i = curIdx; i < nums.length; i++) {
             cache.add(nums[i]);
@@ -4030,12 +4032,12 @@ public class Solution {
             return res;
         }
         List<Integer> tags = new ArrayList<>();
-        for (int num:
-             nums) {
+        for (int num :
+                nums) {
             tags.add(num);
         }
 
-        permuteUniqueHelper(res, tags,  0, 0);
+        permuteUniqueHelper(res, tags, 0, 0);
         return res;
     }
 
@@ -4239,11 +4241,74 @@ public class Solution {
         }
     }
 
+    //351. 安卓系统手势解锁
+    private int mRes;
+    private List<List<Integer>> testRes = new ArrayList<>();
+    private HashMap<Integer, int[]> standardMap = new HashMap<>();
+
+    {
+        standardMap.put(1, new int[]{1, 1});
+        standardMap.put(2, new int[]{1, 2});
+        standardMap.put(3, new int[]{1, 3});
+        standardMap.put(4, new int[]{2, 1});
+        standardMap.put(5, new int[]{2, 2});
+        standardMap.put(6, new int[]{2, 3});
+        standardMap.put(7, new int[]{3, 1});
+        standardMap.put(8, new int[]{3, 2});
+        standardMap.put(9, new int[]{3, 3});
+    }
+
+
+    public int numberOfPatterns(int m, int n) {
+        List<Integer> cache = new ArrayList<>();
+        for (int i = 1; i < 10; i++) {
+            cache.add(i);
+        }
+        mRes = 0;
+        numberOfPatternsHelper(cache, m, n, 0, 0);
+        return mRes;
+    }
+
+    public void numberOfPatternsHelper(List<Integer> cache, int max, int min, int curIdx, int curP) {
+        if (curIdx >= min && curIdx <= max) {
+            mRes++;
+            testRes.add(new ArrayList<>(cache.subList(0, (Math.min(curIdx, cache.size())))));
+        } else if (curIdx > max) {
+            return;
+        }
+        for (int i = curIdx; i < cache.size(); i++) {
+            if (curIdx == 1) {
+                int x = 2;
+            }
+            if (curIdx == 0 || isPatternValid(cache, cache.get(i), curIdx)) {
+                Collections.swap(cache, i, curIdx);
+                numberOfPatternsHelper(cache, max, min, curIdx + 1, i + 1);
+                Collections.swap(cache, i, curIdx);
+            }
+        }
+    }
+
+    public boolean isPatternValid(List<Integer> cache, int end, int curIdx) {
+        int start = cache.get(curIdx - 1);
+        HashSet<Integer> set = new HashSet<>(cache.subList(0, curIdx));
+        boolean isTest = false;
+        int[] startAx = standardMap.get(start);
+        int[] endAx = standardMap.get(end);
+        isTest = (Math.max(Math.abs(startAx[0] - endAx[0]), Math.abs(startAx[1] - endAx[1]))) > 1;
+        if (isTest && (start + end) % 2 == 0) {
+            return set.contains((start + end) / 2);
+        } else {
+            return !set.contains(end);
+        }
+    }
+
+
+
 
     public static void main(String[] args) {
         Solution solution = new Solution();
         int[] test = new int[]{10,1,2,7,6,1,5};
-        System.out.println(solution.combinationSum3(3, 24));
+        System.out.println(solution.numberOfPatterns(2, 1));
     }
 
     public static ListNode generateListNodes(int[] nums) {
