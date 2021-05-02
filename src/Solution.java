@@ -9,6 +9,7 @@ import sun.tools.jstat.JStatLogger;
 import sun.tools.jstat.Jstat;
 
 import javax.swing.plaf.IconUIResource;
+import java.nio.file.Path;
 import java.sql.Struct;
 import java.time.temporal.ChronoField;
 import java.util.*;
@@ -4303,12 +4304,28 @@ public class Solution {
     }
 
 
+    //112. 路径总和
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+        if (root == null) {
+            return false;
+        }
+        if (root.left == null && root.right == null && targetSum == root.val) {
+            return true;
+        }
+        if (root.left != null || root.right != null) {
+            return hasPathSum(root.left, targetSum - root.val)
+                    || hasPathSum(root.right, targetSum - root.val);
+        }
+        return false;
+    }
 
 
     public static void main(String[] args) {
         Solution solution = new Solution();
         int[] test = new int[]{10,1,2,7,6,1,5};
-        System.out.println(solution.numberOfPatterns(2, 1));
+        TreeNode root = new TreeNode(1);
+        root.right = new TreeNode(2);
+        System.out.println(solution.hasPathSum(root, 3));
     }
 
     public static ListNode generateListNodes(int[] nums) {
